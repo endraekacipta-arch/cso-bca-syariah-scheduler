@@ -4007,11 +4007,22 @@ function loadConfig(event) {
       document.getElementById('totalCuti').value= state.totalCuti;
 
       // Restore schedule & istirahat if present
+      // Re-render Step 4 lists
+      renderResignList();
+      renderFlatList();
+      renderMuslimList();
+      renderJadwalKhususList();
+      renderRequestOffList();
+      renderRequestCutiList();
+
+      // Re-render Step 3 CSO list
+      renderCsoList();
+
       if (cfg.schedule && Object.keys(cfg.schedule).length) {
         state.schedule   = cfg.schedule;
         state.istirahat  = cfg.istirahat || {};
         state.violations = cfg.violations || [];
-        const hasSchedule = true;
+        renderResults();
         notify(`✅ Config + Jadwal dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO · jadwal tersedia → klik Step 6 untuk lihat`);
       } else {
         notify(`✅ Config dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO`);
