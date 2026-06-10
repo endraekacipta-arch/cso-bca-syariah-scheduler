@@ -3954,18 +3954,25 @@ function saveConfig() {
     jadwalKhusus:  state.jadwalKhusus  || [],
     requestOff:    state.requestOff    || [],
     requestCuti:   state.requestCuti   || [],
+    schedule:      Object.keys(state.schedule||{}).length ? state.schedule : null,
+    istirahat:     Object.keys(state.istirahat||{}).length ? state.istirahat : null,
   };
+
+  const bulan = MONTHS[config.month] || 'Bulan';
+  const hasSchedule = config.schedule && Object.keys(config.schedule).length > 0;
 
   const json = JSON.stringify(config, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
-  const bulan = MONTHS[config.month] || 'Bulan';
   a.href     = url;
   a.download = `Config_CSO_BCA_Syariah_${bulan}_${config.year}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  notify('💾 Config berhasil disimpan sebagai JSON');
+
+  notify(hasSchedule
+    ? '💾 Config + Jadwal Step 6 berhasil disimpan dalam 1 file JSON'
+    : '💾 Config berhasil disimpan (belum ada jadwal Step 6)');
 }
 
 function loadConfig(event) {
@@ -3999,7 +4006,16 @@ function loadConfig(event) {
       document.getElementById('totalOff').value = state.totalOff;
       document.getElementById('totalCuti').value= state.totalCuti;
 
-      notify(`✅ Config berhasil dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO`);
+      // Restore schedule & istirahat if present
+      if (cfg.schedule && Object.keys(cfg.schedule).length) {
+        state.schedule   = cfg.schedule;
+        state.istirahat  = cfg.istirahat || {};
+        state.violations = cfg.violations || [];
+        const hasSchedule = true;
+        notify(`✅ Config + Jadwal dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO · jadwal tersedia → klik Step 6 untuk lihat`);
+      } else {
+        notify(`✅ Config dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO`);
+      }
 
       // Reset file input so same file can be re-loaded
       event.target.value = '';
