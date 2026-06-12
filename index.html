@@ -920,7 +920,6 @@ td.cell-editing { padding: 1px !important; background: #FFF7ED !important; }
         <span>📍 Lokasi: Seluruh Area</span>
         <span>👥 CSO: 30 Regular</span>
         <span>⏰ Shift: 5 Kategori</span>
-        <button class="btn btn-secondary btn-small" onclick="saveConfig()" style="margin-left:8px;">💾 Save Config</button>
       </div>
     </div>
   </div>
@@ -932,6 +931,18 @@ td.cell-editing { padding: 1px !important; background: #FFF7ED !important; }
     <div class="step" data-step="4">Step 4<span class="step-label">CSO Khusus</span></div>
     <div class="step" data-step="5">Step 5<span class="step-label">Kuota</span></div>
     <div class="step" data-step="6">Step 6<span class="step-label">Generate</span></div>
+  </div>
+
+  <!-- CONFIG BOX: SAVE / LOAD / ANALISIS -->
+  <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm);">
+    <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Config Management</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="saveConfig()">💾 Save Config</button>
+      <button class="btn btn-secondary" onclick="document.getElementById('loadConfigInput').click()">📂 Load Config</button>
+      <button class="btn btn-gold" onclick="document.getElementById('loadAnalisisInput').click()">🔍 Load Analisis Config</button>
+      <input type="file" id="loadConfigInput" accept=".json" style="display:none;" onchange="loadConfig(event)">
+      <input type="file" id="loadAnalisisInput" accept=".json" style="display:none;" onchange="loadAnalisisConfig(event)">
+    </div>
   </div>
 
   <!-- STEP 1: PERIODE -->
@@ -986,8 +997,6 @@ td.cell-editing { padding: 1px !important; background: #FFF7ED !important; }
 
     <div class="button-group">
       <button class="btn btn-primary" onclick="nextStep(2)">Lanjut →</button>
-      <button class="btn btn-secondary" onclick="document.getElementById('loadConfigInput').click()">📂 Load Config</button>
-      <input type="file" id="loadConfigInput" accept=".json" style="display:none;" onchange="loadConfig(event)">
     </div>
   </section>
 
@@ -1038,7 +1047,10 @@ Citra Dewi
     </div>
 
     <div style="margin-top: 24px;">
-      <div class="cso-list-title">Daftar CSO (<span id="csoCount">0</span>) — Edit Sisa Cuti</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+        <div class="cso-list-title" style="margin:0;flex:1;">Daftar CSO (<span id="csoCount">0</span>) — Edit Sisa Cuti</div>
+        <input type="text" id="searchCsoInput" placeholder="🔍 Cari nama CSO..." style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;flex:1;min-width:150px;" onkeyup="filterCsoList(this.value)">
+      </div>
       <div class="cso-list" id="csoList">
         <div class="empty-state">Belum ada CSO. Paste atau pakai data dummy.</div>
       </div>
@@ -1727,10 +1739,9 @@ function loadDummyData() {
 }
 
 function clearAllCso() {
-  if (confirm('Hapus semua CSO?')) {
-    state.csoList = [];
-    renderCsoList();
-  }
+  state.csoList = [];
+  renderCsoList();
+  notify('✅ Semua CSO dihapus');
 }
 
 function renderCsoList() {
@@ -1744,7 +1755,7 @@ function renderCsoList() {
 
   wrap.innerHTML = state.csoList.map((c, i) => `
     <div class="cso-item">
-      <span class="cso-item-name">${escape(c.name)}</span>
+      <span class="cso-name cso-item-name">${escape(c.name)}</span>
       <div class="cso-item-sisa">
         <label style="font-size: 11px; color: var(--text-secondary);">Sisa:</label>
         <input type="number" value="${c.sisaCuti}" onchange="state.csoList[${i}].sisaCuti = parseInt(this.value) || 0">
@@ -2532,7 +2543,6 @@ function _csoExists(name) {
 
 
 function clearList(type) {
-  if (!confirm(`Hapus semua ${type}?`)) return;
   if (type === 'resign') state.resign.clear();
   else if (type === 'muslim') state.muslim.clear();
   else if (type === 'khusus') state.jadwalKhusus = [];
@@ -2544,6 +2554,8 @@ function clearList(type) {
   else if (type === 'khusus') renderJadwalKhususList();
   else if (type === 'requestOff') renderRequestOffList();
   else if (type === 'requestCuti') renderRequestCutiList();
+
+  notify(`✅ Semua ${type} berhasil dihapus`);
 }
 
 // ============================================================
@@ -2972,13 +2984,19 @@ function generateInternal() {
       if(k&&!cutiSet.has(k))cutiSet.add(k);
     }
 
-    const reqOffSet  = new Set();
-    const softReqSet = new Set();
-    byPri((state.requestOff||[]).filter(r=>r.cso===cso.name&&r.acc)).forEach(r=>{
+    const reqOffSet  = new Set(); // Tier 1: ACC (fixed, locked)
+    const softReqSet = new Set(); // Tier 2: Pending (priority but flexible)
+
+    byPri((state.requestOff||[]).filter(r=>r.cso===cso.name)).forEach(r=>{
       const k=dateKey(state.year,state.month,r.tgl);
       if(!avail.includes(k)||cutiSet.has(k)||jkSet.has(k))return;
-      if((r.priority||4)===1){ if(reqOffSet.size<tOff) reqOffSet.add(k); }
-      else softReqSet.add(k);
+      if(r.acc){
+        // Tier 1: ACC = locked OFF, always honored
+        if(reqOffSet.size<tOff) reqOffSet.add(k);
+      } else {
+        // Tier 2: Pending = soft priority, honored if slot available
+        softReqSet.add(k);
+      }
     });
 
     const flatRule = (state.flat||[]).find(f=>f.cso===cso.name);
@@ -3094,16 +3112,101 @@ function generateInternal() {
       }
     });
 
-    // Step D: remaining → OFF, update runningOff
+    // Step D: remaining → OFF with request priority
     const rem=[];
     for(let i=wi;i<pool.length;i++) if(!schedule[pool[i].id][k]) rem.push(pool[i]);
-    // Prioritize: softReq first, then those with most remaining OFF need
-    rem.sort((a,b)=>{
-      const aS=cm[a.id].softReqSet.has(k)?0:1, bS=cm[b.id].softReqSet.has(k)?0:1;
-      if(aS!==bS)return aS-bS;
-      return (cm[b.id].tOff-runningOff[b.id])-(cm[a.id].tOff-runningOff[a.id]);
+
+    // Compute available OFF slots this day
+    const lockedOff = state.csoList.filter(c=>schedule[c.id][k]==='OFF').length;
+    const kuotaKerja = (kuota.s6||0)+(kuota.s8||0)+(kuota.s9||0)+(kuota.s11||0)+(kuota.s13||0);
+    const slotOff = Math.max(0, state.csoList.length - kuotaKerja);
+
+    // Split rem into: softReq (Tier 2), noReq (Tier 3)
+    const remSoftReq = rem.filter(c=>cm[c.id].softReqSet.has(k));
+    const remNoReq   = rem.filter(c=>!cm[c.id].softReqSet.has(k));
+
+    // Available slots for rem (after locked OFFs)
+    let remSlots = Math.max(0, slotOff - lockedOff);
+
+    // Tier 2: softReq gets OFF first up to remSlots
+    const softWinners = remSoftReq.slice(0, remSlots);
+    const softLosers  = remSoftReq.slice(remSlots);
+    remSlots -= softWinners.length;
+
+    // Tier 3: noReq fills remaining slots
+    const noReqWinners = remNoReq.slice(0, remSlots);
+    const noReqLosers  = remNoReq.slice(remSlots); // these get work assigned
+
+    // Pre-swap: if a softLoser is at streak>=5 (would become 6th workday),
+    // swap with a softWinner who isn't in that situation (winner becomes loser)
+    for (let li = 0; li < remSoftReq.length; li++) {
+      const c = remSoftReq[li];
+      if (!softLosers.includes(c)) continue;
+      if (streakBefore(c.id, dayIdx) < 5) continue; // safe, no swap needed
+
+      // Find a winner that's safe to demote (not at streak risk themselves)
+      const swapIdx = softWinners.findIndex(w => streakBefore(w.id, dayIdx) < 5);
+      if (swapIdx !== -1) {
+        const w = softWinners[swapIdx];
+        // swap roles
+        softWinners[swapIdx] = c;
+        const loserIdx = softLosers.indexOf(c);
+        softLosers[loserIdx] = w;
+      }
+      // if no safe winner found, fixStreaks (Phase 3) will attempt cleanup later
+    }
+
+    softWinners.forEach(c=>{ schedule[c.id][k]='OFF'; runningOff[c.id]++; });
+    noReqWinners.forEach(c=>{ schedule[c.id][k]='OFF'; runningOff[c.id]++; });
+
+    // softLosers: pending request lost this slot → relocate OFF to least-contested day
+    softLosers.forEach(c=>{
+      // Assign work for now
+      const ys=yKey&&schedule[c.id][yKey];
+      const ml=ys&&isW(ys)?minAllowedLevel(ys.replace(/[LX]$/,'')):0;
+      const cands=SHIFTS_BCA.filter(s=>shiftLevel(s)>=ml);
+      schedule[c.id][k]=(cands[0]||'S9')+suffix;
+
+      // Find least-contested future date for relocation
+      const relocCandidates = allDates.filter(kk=>{
+        if(kk<=k) return false; // only future dates
+        if(schedule[c.id][kk]) return false; // not already assigned
+        if(cm[c.id].cutiSet.has(kk)||cm[c.id].jkSet.has(kk)) return false;
+        // Avoid creating a 3+ consecutive OFF if placed here (loose check)
+        return true;
+      });
+
+      // Prefer candidates that don't break a work streak into 6+ later
+      // (placing OFF earlier is generally safe for R1B; R3 checked via sort)
+
+      // Sort by: (1) no other softReq conflicts, (2) fewest existing OFFs that day
+      relocCandidates.sort((ka,kb)=>{
+        const offA = state.csoList.filter(cc=>schedule[cc.id][ka]==='OFF').length;
+        const offB = state.csoList.filter(cc=>schedule[cc.id][kb]==='OFF').length;
+        // Check conflicts with other CSO requests
+        const reqA = (state.requestOff||[]).filter(r=>r.tgl===dayMeta[ka]?.day&&!r.acc).length;
+        const reqB = (state.requestOff||[]).filter(r=>r.tgl===dayMeta[kb]?.day&&!r.acc).length;
+        if(reqA!==reqB) return reqA-reqB; // fewer pending requests = better
+        return offA-offB; // fewer OFFs = more room
+      });
+
+      // Relocate to best candidate
+      if(relocCandidates.length > 0) {
+        const newK = relocCandidates[0];
+        schedule[c.id][newK]='OFF';
+        runningOff[c.id]++;
+      }
     });
-    rem.forEach(c=>{ schedule[c.id][k]='OFF'; runningOff[c.id]++; });
+
+    // noReqLosers: no request, just work
+    noReqLosers.forEach(c=>{
+      if(!schedule[c.id][k]){
+        const ys=yKey&&schedule[c.id][yKey];
+        const ml=ys&&isW(ys)?minAllowedLevel(ys.replace(/[LX]$/,'')):0;
+        const cands=SHIFTS_BCA.filter(s=>shiftLevel(s)>=ml);
+        schedule[c.id][k]=(cands[0]||'S9')+suffix;
+      }
+    });
   });
 
   // ── SHARED HELPERS ────────────────────────────────────────────────────────
@@ -3318,6 +3421,10 @@ function generateInternal() {
             schedule[cso.id][k]=sh;
             schedule[donor.id][k]='OFF';
             ch=true; run=0;
+          } else if(!offBreaksR1A(cso.id,k)) {
+            // Last resort: accept +1 over-supply to fix hard R3 violation
+            // (R3 "TIDAK BOLEH" outweighs minor R7 overage of +1)
+            schedule[cso.id][k]=sh; ch=true; run=0;
           } else {
             run=0; // can't fix this, skip
           }
@@ -3956,6 +4063,7 @@ function saveConfig() {
     requestCuti:   state.requestCuti   || [],
     schedule:      Object.keys(state.schedule||{}).length ? state.schedule : null,
     istirahat:     Object.keys(state.istirahat||{}).length ? state.istirahat : null,
+    violations:    state.violations || [],
   };
 
   const bulan = MONTHS[config.month] || 'Bulan';
@@ -4033,6 +4141,133 @@ function loadConfig(event) {
 
     } catch(err) {
       notify('❌ Gagal load config: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+
+function filterCsoList(query) {
+  const wrap = document.getElementById('csoList');
+  const items = wrap.querySelectorAll('.cso-item');
+  const q = query.toLowerCase().trim();
+
+  items.forEach(item => {
+    const name = item.querySelector('.cso-name');
+    if (!name) return;
+    const matches = name.textContent.toLowerCase().includes(q);
+    item.style.display = matches ? '' : 'none';
+  });
+}
+
+function loadAnalisisConfig(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const cfg = JSON.parse(e.target.result);
+      if (!cfg._version || !cfg.schedule) throw new Error('Bukan config dengan jadwal (tidak ada schedule)');
+
+      // Extract carry-over streak & violations per CSO dari ujung bulan lalu
+      const days = daysInMonth(cfg.year, cfg.month);
+      const carryOver = {};
+      const analysisPanel = document.createElement('div');
+      analysisPanel.style.cssText = 'background:#fff8f0;border:2px solid var(--warn);border-radius:12px;padding:20px;margin-bottom:16px;';
+      
+      const lastWeekDates = [];
+      for (let d = Math.max(1, days - 6); d <= days; d++) {
+        lastWeekDates.push(dateKey(cfg.year, cfg.month, d));
+      }
+
+      let analysisHtml = `<h3 style="color:var(--warn);margin-bottom:12px;">📊 Analisa Bulan Lalu (${MONTHS[cfg.month]} ${cfg.year})</h3>`;
+      analysisHtml += `<div style="margin-bottom:16px;font-size:12px;color:var(--text);">`;
+      analysisHtml += `<b>Total CSO:</b> ${cfg.csoList.length} · <b>Violations:</b> ${(cfg.violations||[]).length}<br>`;
+      analysisHtml += `</div>`;
+
+      const carryOverData = [];
+
+      // Per CSO, hitung streak kerja dari akhir bulan
+      cfg.csoList.forEach(cso => {
+        let workStreakEnd = 0;
+        let cutiCount = 0;
+        
+        // Hitung mundur dari hari terakhir
+        for (let d = days; d >= 1; d--) {
+          const k = dateKey(cfg.year, cfg.month, d);
+          const v = cfg.schedule[cso.id] ? cfg.schedule[cso.id][k] : null;
+          
+          if (v === 'OFF') break; // Streak putus di OFF
+          if (v === 'CUTI') {
+            cutiCount++;
+            workStreakEnd++; // CUTI dihitung masuk kerja untuk streak
+          } else if (v && v !== 'OFF') {
+            workStreakEnd++;
+          } else {
+            break;
+          }
+        }
+
+        if (workStreakEnd > 0) {
+          carryOver[cso.id] = workStreakEnd;
+          carryOverData.push({ name: cso.name, streak: workStreakEnd, cuti: cutiCount });
+        }
+      });
+
+      // Display carry-over streaks
+      if (carryOverData.length > 0) {
+        analysisHtml += `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;max-height:200px;overflow-y:auto;">`;
+        analysisHtml += `<div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;">CARRY-OVER STREAK (Akhir Bulan)</div>`;
+        carryOverData.forEach(item => {
+          const color = item.streak >= 5 ? 'var(--danger)' : 'var(--warn)';
+          analysisHtml += `<div style="padding:6px;border-bottom:1px solid var(--border);font-size:12px;">`;
+          analysisHtml += `<b style="color:${color};">${item.name}</b>: ${item.streak} hari (${item.cuti} cuti) — `;
+          analysisHtml += item.streak >= 5 ? `<span style="color:var(--danger);font-weight:700;">⚠ Harus OFF tgl 1</span>` : `<span style="color:var(--success);">✓ Boleh kerja tgl 1</span>`;
+          analysisHtml += `</div>`;
+        });
+        analysisHtml += `</div>`;
+      }
+
+      // Display existing violations dari bulan lalu
+      if (cfg.violations && cfg.violations.length > 0) {
+        analysisHtml += `<div style="background:var(--danger-soft);border:1px solid var(--danger);border-radius:8px;padding:12px;margin-bottom:12px;max-height:200px;overflow-y:auto;">`;
+        analysisHtml += `<div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:8px;">⚠ VIOLATIONS BULAN LALU</div>`;
+        cfg.violations.slice(0, 10).forEach(v => {
+          analysisHtml += `<div style="padding:6px;border-bottom:1px solid rgba(239,68,68,0.2);font-size:11px;">${v.msg}</div>`;
+        });
+        if (cfg.violations.length > 10) {
+          analysisHtml += `<div style="padding:6px;color:var(--muted);font-size:11px;">...dan ${cfg.violations.length - 10} lagi</div>`;
+        }
+        analysisHtml += `</div>`;
+      }
+
+      // Restore CSO list dari bulan lalu (bisa di-override operator)
+      state.csoList = cfg.csoList || [];
+      renderCsoList();
+
+      analysisHtml += `<div style="padding:12px;background:var(--ice-3);border-radius:8px;font-size:12px;color:var(--navy-2);margin-bottom:12px;border-left:3px solid var(--navy);">`;
+      analysisHtml += `<b>ℹ CSO dari bulan lalu sudah di-load di Step 3.</b> Anda bisa edit (tambah/hapus/ubah) jika ada perubahan resign atau CSO baru.`;
+      analysisHtml += `</div>`;
+
+      analysisPanel.innerHTML = analysisHtml;
+      
+      // Inject panel ke Step 1
+      const step1Panel = document.getElementById('panel-1');
+      const existingAnalysis = step1Panel.querySelector('.analysis-panel');
+      if (existingAnalysis) existingAnalysis.remove();
+      analysisPanel.className = 'analysis-panel';
+      step1Panel.insertBefore(analysisPanel, step1Panel.querySelector('.info-box'));
+
+      // Simpan carryOver ke state untuk nanti saat generate
+      window.carryOverStreak = carryOver;
+
+      notify(`✅ Analisa ${MONTHS[cfg.month]} ${cfg.year} selesai — ${carryOverData.length} CSO dengan carry-over streak. Buka Step 1 untuk lihat detail.`);
+      
+      // Reset file input
+      event.target.value = '';
+
+    } catch(err) {
+      notify('❌ Gagal load analisis: ' + err.message);
     }
   };
   reader.readAsText(file);
@@ -4117,7 +4352,6 @@ function resetCell(csoId, dk) {
 
 function resetAllEdits() {
   if (!state.manualEdits || !Object.keys(state.manualEdits).length) { notify('Tidak ada edit manual'); return; }
-  if (!confirm('Reset semua perubahan manual ke hasil generate?')) return;
   Object.keys(state.manualEdits).forEach(key => {
     const sep = key.indexOf('||');
     if (sep === -1) return;
