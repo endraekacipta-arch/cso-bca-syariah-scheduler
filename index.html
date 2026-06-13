@@ -1453,8 +1453,9 @@ Citra Dewi
 
     <div id="violationsContainer"></div>
 
-    <div style="display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap;">
+    <div style="display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; align-items:center;">
       <button class="btn btn-secondary btn-small" onclick="exportCSV()">📥 Export CSV</button>
+      <span style="font-size:11px;color:var(--muted);">⚠ CSV bisa kacau di Excel (locale Indonesia). Rekomendasi: pakai <b>📊 Export Excel (Formatted)</b> di tab Shift Report →</span>
       <button class="btn btn-secondary btn-small" id="btnResetEdits" onclick="resetAllEdits()" style="display:none;">
         ↩ Reset Edit (<span id="editCount">0</span>)
       </button>
