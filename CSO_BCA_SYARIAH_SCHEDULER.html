@@ -861,8 +861,10 @@ textarea {
 /* ── Manual Edit ─────────────────────────────────── */
 .cell-edited { outline:2px solid #F97316 !important; outline-offset:-2px; position:relative; }
 .cell-edited::after { content:''; position:absolute; top:2px; right:2px; width:5px; height:5px; background:#F97316; border-radius:50%; }
-.schedule-table td[data-cso] { cursor:pointer; user-select:none; transition:box-shadow .1s; }
+.schedule-table td[data-cso] { cursor:pointer; user-select:none; transition:box-shadow .1s; position:relative; }
 .schedule-table td[data-cso]:active { box-shadow: inset 0 0 0 2px var(--primary); }
+.edit-caret { position:absolute; bottom:1px; right:2px; font-size:7px; line-height:1; color:var(--text-secondary); opacity:.35; pointer-events:none; }
+.cell-editable:hover .edit-caret { opacity:.8; }
 @media (hover:hover) {
   .schedule-table td[data-cso]:hover { box-shadow: inset 0 0 0 2px var(--primary); filter:brightness(.95); }
 }
@@ -1182,7 +1184,7 @@ Citra Dewi
     <!-- TAB: JADWAL KHUSUS -->
     <div id="khusus" class="tab-content hidden">
       <div class="info-box">
-        <strong>Rule 11:</strong> BB/TK/CCT/CSPV (perencanaan awal bulan). CM (potong cuti). SAKIT (tidak potong).
+        <strong>Rule 11:</strong> BB/TK/CCT/CSPV (perencanaan awal bulan di sini). CM &amp; SAKIT (input saat terjadi via edit cell di Step 6).
       </div>
       <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: flex-end;">
         <div style="flex: 1; min-width: 150px;">
@@ -1219,8 +1221,6 @@ Citra Dewi
             <option value="TK">TK</option>
             <option value="CCT">CCT</option>
             <option value="CSPV">CSPV</option>
-            <option value="CM">CM</option>
-            <option value="SAKIT">SAKIT</option>
           </select>
         </div>
         <button class="btn btn-secondary btn-small" onclick="addJadwalKhusus()">+ Tambah</button>
@@ -1454,8 +1454,8 @@ Citra Dewi
     <div id="violationsContainer"></div>
 
     <div style="display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; align-items:center;">
-      <button class="btn btn-secondary btn-small" onclick="exportCSV()">📥 Export CSV</button>
-      <span style="font-size:11px;color:var(--muted);">⚠ CSV bisa kacau di Excel (locale Indonesia). Rekomendasi: pakai <b>📊 Export Excel (Formatted)</b> di tab Shift Report →</span>
+      <button class="btn btn-primary btn-small" onclick="exportShiftReportExcel()">📊 Export Excel</button>
+      <span style="font-size:11px;color:var(--muted);">Berisi 3 sheet: Jadwal · Shift Report · Istirahat (terformat)</span>
       <button class="btn btn-secondary btn-small" id="btnResetEdits" onclick="resetAllEdits()" style="display:none;">
         ↩ Reset Edit (<span id="editCount">0</span>)
       </button>
@@ -1505,9 +1505,6 @@ Citra Dewi
       <div class="table-wrapper">
         <table class="schedule-table" id="istirahatTable"></table>
       </div>
-      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-small" onclick="exportIstirahatCSV()">📥 Export Istirahat CSV</button>
-      </div>
       <!-- Report per tanggal -->
       <div id="istirahatReport" style="margin-top:20px;"></div>
     </div>
@@ -1518,9 +1515,7 @@ Citra Dewi
         📊 <b>Shift Report</b> — Rekap jumlah CSO per shift per tanggal. Cocokkan dengan kebutuhan operasional harian.
       </div>
       <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <button class="btn btn-secondary btn-small" onclick="exportShiftReportCSV()">📥 Export CSV</button>
-        <button class="btn btn-primary btn-small" onclick="exportShiftReportExcel()">📊 Export Excel (Formatted)</button>
-        <span style="font-size:11px;color:var(--muted);">S6 / S8 / S9 / S11 / S13 · per tanggal · per site</span>
+        <span style="font-size:11px;color:var(--muted);">S6 / S8 / S9 / S11 / S13 · per tanggal · per site · Export via tombol 📊 Export Excel di atas</span>
       </div>
       <div class="table-wrapper">
         <table class="schedule-table" id="shiftReportTable"></table>
@@ -4175,7 +4170,7 @@ function renderScheduleTable() {
       if (_locked) {
         html += `<td class="${cls}">${label}</td>`;
       } else {
-        html += `<td class="${cls}" data-cso="${c.id}" onclick="event.stopPropagation(); openCellEditor('${c.id}','${k}',this)">${label}</td>`;
+        html += `<td class="${cls} cell-editable" data-cso="${c.id}" onclick="event.stopPropagation(); openCellEditor('${c.id}','${k}',this)">${label}<span class="edit-caret">▾</span></td>`;
       }
     }
   // Right summary columns per CSO — with target indication
@@ -4284,8 +4279,23 @@ function saveConfig() {
   const tOff  = parseInt(document.getElementById('totalOff').value)  || state.totalOff;
   const tCuti = parseInt(document.getElementById('totalCuti').value) || state.totalCuti;
 
+  // Task 5: hitung CUTI terpakai per CSO dari jadwal Step 6 (CUTI + CM, keduanya potong cuti)
+  // SAKIT tidak dihitung (tidak potong jatah cuti). CM potong cuti.
+  const cutiTerpakai = {};
+  if (state.schedule && Object.keys(state.schedule).length) {
+    state.csoList.forEach(c => {
+      let used = 0;
+      const sched = state.schedule[c.id] || {};
+      Object.values(sched).forEach(v => {
+        if (v === 'CUTI') used++;
+        else if (v && v.match(/^CM/)) used++;  // Cuti Mendadak potong jatah
+      });
+      cutiTerpakai[c.name] = used;
+    });
+  }
+
   const config = {
-    _version: 'v6',
+    _version: 'v6c',
     _savedAt: new Date().toISOString(),
     month:      isNaN(m) ? state.month : m,
     year:       isNaN(y) ? state.year  : y,
@@ -4304,6 +4314,7 @@ function saveConfig() {
     schedule:      Object.keys(state.schedule||{}).length ? state.schedule : null,
     istirahat:     Object.keys(state.istirahat||{}).length ? state.istirahat : null,
     violations:    state.violations || [],
+    cutiTerpakai:  cutiTerpakai,   // Task 5: {namaCSO: jumlahCutiTerpakai}
   };
 
   const bulan = MONTHS[config.month] || 'Bulan';
@@ -4483,10 +4494,37 @@ function loadAnalisisConfig(event) {
 
       // Restore CSO list dari bulan lalu (bisa di-override operator)
       state.csoList = cfg.csoList || [];
+
+      // Task 5: kurangi sisaCuti per CSO dengan cuti yang terpakai bulan lalu
+      const cutiTerpakai = cfg.cutiTerpakai || {};
+      const cutiAdjusted = [];
+      if (Object.keys(cutiTerpakai).length) {
+        state.csoList.forEach(c => {
+          const used = cutiTerpakai[c.name] || 0;
+          if (used > 0) {
+            const before = (typeof c.sisaCuti === 'number') ? c.sisaCuti : parseInt(c.sisaCuti) || 0;
+            c.sisaCuti = Math.max(0, before - used);
+            cutiAdjusted.push({ name: c.name, before, used, after: c.sisaCuti });
+          }
+        });
+      }
       renderCsoList();
 
+      // Task 5: tampilkan penyesuaian sisa cuti
+      if (cutiAdjusted.length > 0) {
+        analysisHtml += `<div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px;margin-bottom:12px;max-height:220px;overflow-y:auto;">`;
+        analysisHtml += `<div style="font-size:11px;font-weight:700;color:#78350F;margin-bottom:8px;">🏖 SISA CUTI DISESUAIKAN (dikurangi cuti terpakai bulan lalu)</div>`;
+        cutiAdjusted.forEach(item => {
+          analysisHtml += `<div style="padding:5px 6px;border-bottom:1px solid rgba(253,230,138,0.6);font-size:12px;display:flex;justify-content:space-between;gap:8px;">`;
+          analysisHtml += `<b>${escape(item.name)}</b>`;
+          analysisHtml += `<span style="color:#78350F;">${item.before} − ${item.used} terpakai = <b style="color:${item.after===0?'var(--danger)':'#1B5E3F'};">${item.after}</b></span>`;
+          analysisHtml += `</div>`;
+        });
+        analysisHtml += `</div>`;
+      }
+
       analysisHtml += `<div style="padding:12px;background:var(--ice-3);border-radius:8px;font-size:12px;color:var(--navy-2);margin-bottom:12px;border-left:3px solid var(--navy);">`;
-      analysisHtml += `<b>ℹ CSO dari bulan lalu sudah di-load di Step 3.</b> Anda bisa edit (tambah/hapus/ubah) jika ada perubahan resign atau CSO baru.`;
+      analysisHtml += `<b>ℹ CSO dari bulan lalu sudah di-load di Step 3.</b> Sisa cuti otomatis dikurangi cuti terpakai bulan lalu. Anda bisa edit (tambah/hapus/ubah) jika ada perubahan resign atau CSO baru.`;
       analysisHtml += `</div>`;
 
       analysisPanel.innerHTML = analysisHtml;
@@ -4619,37 +4657,26 @@ function openCellEditor(csoId, dk, cellEl) {
   const we   = isWeekend(date), hol = state.holidays.has(dk), cb = state.cb.has(dk);
   const sfx  = cb ? 'X' : (we || hol ? 'L' : '');
 
-  // Rule 1A window from neighbors
-  const days = daysInMonth(state.year, state.month);
-  const allD = [];
-  for (let dd = 1; dd <= days; dd++) allD.push(dateKey(state.year, state.month, dd));
-  const idx2 = allD.indexOf(dk);
-  const yv   = idx2 > 0 && state.schedule[csoId] && state.schedule[csoId][allD[idx2-1]];
-  const nv   = idx2+1 < allD.length && state.schedule[csoId] && state.schedule[csoId][allD[idx2+1]];
-  const isWv = v => v && v !== 'OFF' && v !== 'CUTI' && v !== 'RESIGN' && !v.match(/^(BB|TK|CCT|CSPV)/);
-  let minL = 0, maxL = 99;
-  if (yv && isWv(yv)) minL = minAllowedLevel(yv.replace(/[LX]$/, ''));
-  if (nv && isWv(nv)) { const nl = shiftLevel(nv.replace(/[LX]$/, '')); if (nl) maxL = nl + 3; }
-
   const cur = (state.schedule[csoId] && state.schedule[csoId][dk]) || '';
 
-  // Build option list
+  // Build option list — label "Shift N", no warning mark (violation panel handles jumping)
   const opts = [];
   ['S6','S8','S9','S11','S13'].forEach(s => {
-    const lvl = shiftLevel(s);
-    const invalid = lvl < minL || lvl > maxL;
+    const num = shiftLevel(s);
     const val = s + sfx;
-    opts.push({ val, label: s + (sfx ? ' ('+sfx+')' : '') + (invalid ? ' ⚠' : ''), disabled: invalid });
+    opts.push({ val, label: 'Shift ' + num + (sfx ? ' ('+sfx+')' : '') });
   });
-  opts.push({ val: 'OFF',  label: 'OFF',  disabled: false });
-  opts.push({ val: 'CUTI', label: 'CUTI', disabled: false });
+  opts.push({ val: 'OFF',  label: 'OFF' });
+  opts.push({ val: 'CUTI', label: 'CUTI' });
+  opts.push({ val: 'CM',   label: 'CM (Cuti Mendadak)' });
+  opts.push({ val: 'SAKIT', label: 'SAKIT' });
 
   const curBase = cur.replace(/[LX]$/, '');
   const sel = document.createElement('select');
   sel.className = 'cell-inline-select';
   sel.innerHTML = opts.map(o => {
     const selected = (o.val === cur || o.val.replace(/[LX]$/,'') === curBase && o.val === curBase + sfx) ? 'selected' : '';
-    return `<option value="${o.val}" ${o.disabled ? 'disabled' : ''} ${selected}>${o.label}</option>`;
+    return `<option value="${o.val}" ${selected}>${o.label}</option>`;
   }).join('');
 
   cellEl.classList.add('cell-editing');
@@ -5138,12 +5165,24 @@ function renderShiftReport() {
 // EXPORT EXCEL — FORMATTED (xlsx-js-style)
 // ============================================================
 const XL_COLORS = {
-  S6:  'BFDBFE', S8:  'E9D5FF', S9:  'A7F3D0', S11: 'FED7AA', S13: 'FBCFE8',
-  OFF: 'E5E7EB', CUTI:'FEF08A', RESIGN:'D1D5DB',
+  // Shift biasa = putih. Status khusus saja yang berwarna.
+  OFF:    'D1D5DB',   // abu-abu
+  CUTI:   'FDE68A',   // kuning
+  EDITED: 'FDE68A',   // kuning (sama dgn cuti, hanya pembeda dari shift)
+  CMSAKIT:'FCA5A5',   // merah (CM / SAKIT)
+  RESIGN: 'E5E7EB',   // abu muda
+  WHITE:  'FFFFFF',
   headerBg: '1B5E3F', headerFg: 'FFFFFF',
-  weekendBg:'FEE2E2', cbBg:'DBEAFE', holidayBg:'FECACA',
+  // Penanda hari pada header
+  weekendBg:'FBBF24', holidayBg:'EF4444', cbBg:'3B82F6',
 };
-const thinBorder = { top:{style:'thin',color:{rgb:'D1D5DB'}}, bottom:{style:'thin',color:{rgb:'D1D5DB'}}, left:{style:'thin',color:{rgb:'D1D5DB'}}, right:{style:'thin',color:{rgb:'D1D5DB'}} };
+const thinBorder = { top:{style:'thin',color:{rgb:'D9DEE3'}}, bottom:{style:'thin',color:{rgb:'D9DEE3'}}, left:{style:'thin',color:{rgb:'D9DEE3'}}, right:{style:'thin',color:{rgb:'D9DEE3'}} };
+
+// Excel display: "S6" -> "SHIFT 6", "S13L" -> "SHIFT 13L". Non-shift (OFF/CUTI/RESIGN/CM/SAKIT/BB/...) unchanged.
+function xlShiftLabel(v) {
+  if (!v) return '';
+  return /^S\d/.test(v) ? v.replace(/^S(\d+)/, 'SHIFT $1') : v;
+}
 
 function xlStyle(opts) {
   const s = { border: thinBorder, alignment:{ horizontal:'center', vertical:'center' } };
@@ -5156,26 +5195,24 @@ function xlStyle(opts) {
   return s;
 }
 
-function shiftCellStyle(val, dayMeta) {
+function shiftCellStyle(val, dayMeta, isEdited) {
   if (!val) return xlStyle({});
-  if (val === 'OFF')   return xlStyle({ bg: XL_COLORS.OFF, fg:'6B7280', italic:true });
-  if (val === 'CUTI')  return xlStyle({ bg: XL_COLORS.CUTI, fg:'854D0E', bold:true });
-  if (val === 'RESIGN') return xlStyle({ bg: XL_COLORS.RESIGN, fg:'374151', italic:true });
-  const base = val.replace(/[LX]$/,'');
-  const isCB = val.endsWith('X');
-  const isL  = val.endsWith('L');
-  let bg = XL_COLORS[base] || 'FFFFFF';
-  let fg = '1F2937';
-  if (isCB) { fg='1D4ED8'; }       // CB suffix → blue text marker
-  if (isL)  { fg='B91C1C'; }       // Libur suffix → red text marker
-  return xlStyle({ bg, fg, bold:true });
+  // Edit manual → kuning (override warna shift, biar kelihatan diubah)
+  if (isEdited) return xlStyle({ bg: XL_COLORS.EDITED, fg:'1F2937', bold:true });
+  if (val === 'OFF')    return xlStyle({ bg: XL_COLORS.OFF, fg:'4B5563', italic:true });
+  if (val === 'CUTI')   return xlStyle({ bg: XL_COLORS.CUTI, fg:'854D0E', bold:true });
+  if (val === 'CM' || val === 'SAKIT') return xlStyle({ bg: XL_COLORS.CMSAKIT, fg:'7F1D1D', bold:true });
+  if (val === 'RESIGN') return xlStyle({ bg: XL_COLORS.RESIGN, fg:'6B7280', italic:true });
+  if (val.match(/^(BB|TK|CCT|CSPV)/)) return xlStyle({ bg: XL_COLORS.WHITE, fg:'1F2937', bold:true });
+  // Shift biasa (termasuk suffix L/X) → putih polos
+  return xlStyle({ bg: XL_COLORS.WHITE, fg:'1F2937', bold:true });
 }
 
 function dayHeaderStyle(dayMeta) {
   let bg = XL_COLORS.headerBg, fg = XL_COLORS.headerFg;
-  if (dayMeta.isCb)      bg = '2563EB';
-  else if (dayMeta.isHoliday) bg = 'DC2626';
-  else if (dayMeta.isWeekend) bg = 'D97706';
+  if (dayMeta.isCb)      bg = XL_COLORS.cbBg;
+  else if (dayMeta.isHoliday) bg = XL_COLORS.holidayBg;
+  else if (dayMeta.isWeekend) bg = XL_COLORS.weekendBg;
   return xlStyle({ bg, fg, bold:true, size:10 });
 }
 
@@ -5222,7 +5259,7 @@ function exportShiftReportExcel() {
       let work=0, off=0, cuti=0;
       dayMeta.forEach(m => {
         const v = (state.schedule[c.id]||{})[m.k] || '';
-        row.push(v);
+        row.push(xlShiftLabel(v));
         if (v==='OFF') off++;
         else if (v==='CUTI') cuti++;
         else if (v && v!=='RESIGN') work++;
@@ -5234,11 +5271,11 @@ function exportShiftReportExcel() {
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     ws['!merges'] = merges;
 
-    // Column widths
+    // Column widths — day columns wide enough for "SHIFT 13L"
     const colWidths = [
-      { wch:4 }, { wch:20 }, { wch:9 }, { wch:14 },
-      ...dayMeta.map(()=>({ wch:5 })),
-      { wch:9 }, { wch:6 }, { wch:6 },
+      { wch:4 }, { wch:22 }, { wch:9 }, { wch:15 },
+      ...dayMeta.map(()=>({ wch:9 })),
+      { wch:11 }, { wch:6 }, { wch:6 },
     ];
     ws['!cols'] = colWidths;
     ws['!rows'] = [{ hpt:22 }, { hpt:18 }];
@@ -5270,13 +5307,16 @@ function exportShiftReportExcel() {
       dayMeta.forEach((m,di) => {
         const addr = XLSX.utils.encode_cell({r, c:4+di});
         const v = (state.schedule[c.id]||{})[m.k] || '';
-        if (ws[addr]) ws[addr].s = shiftCellStyle(v, m);
+        const isEd = !!(state.manualEdits && state.manualEdits[c.id + '||' + m.k]);
+        if (ws[addr]) ws[addr].s = shiftCellStyle(v, m, isEd);
       });
-      // Total cols
-      [4+days, 5+days, 6+days].forEach(ci => {
-        const addr = XLSX.utils.encode_cell({r, c:ci});
-        if (ws[addr]) ws[addr].s = xlStyle({ bold:true, bg:'F0FDF4' });
-      });
+      // Total cols — warnai sesuai legend: Total Kerja putih, OFF abu, CUTI kuning
+      const totAddr = XLSX.utils.encode_cell({r, c:4+days});
+      const offAddr = XLSX.utils.encode_cell({r, c:5+days});
+      const ctAddr  = XLSX.utils.encode_cell({r, c:6+days});
+      if (ws[totAddr]) ws[totAddr].s = xlStyle({ bold:true, bg:XL_COLORS.WHITE });
+      if (ws[offAddr]) ws[offAddr].s = xlStyle({ bold:true, bg:XL_COLORS.OFF, fg:'4B5563' });
+      if (ws[ctAddr])  ws[ctAddr].s  = xlStyle({ bold:true, bg:XL_COLORS.CUTI, fg:'854D0E' });
     });
 
     XLSX.utils.book_append_sheet(wb, ws, 'Jadwal');
@@ -5325,16 +5365,16 @@ function exportShiftReportExcel() {
         const addr = XLSX.utils.encode_cell({r,c});
         if (!ws[addr]) return;
         const shiftCol = SHIFT_KEYS[c-3];
-        if (shiftCol) {
-          ws[addr].s = xlStyle({ bg: XL_COLORS[shiftCol], bold:true });
-        } else if (c===8) { // Total Kerja
-          ws[addr].s = xlStyle({ bg:'F0FDF4', bold:true });
-        } else if (c===9) { // OFF
-          ws[addr].s = xlStyle({ bg:XL_COLORS.OFF, fg:'6B7280' });
-        } else if (c===10) { // CUTI
-          ws[addr].s = xlStyle({ bg:XL_COLORS.CUTI, fg:'854D0E' });
-        } else {
-          ws[addr].s = xlStyle({ bg: rowBg, align: c===2?'left':'center', bold: c===0 });
+        if (shiftCol) {            // kolom jumlah per shift → putih
+          ws[addr].s = xlStyle({ bg: XL_COLORS.WHITE, bold:true });
+        } else if (c===8) {        // Total Kerja → putih
+          ws[addr].s = xlStyle({ bg: XL_COLORS.WHITE, bold:true });
+        } else if (c===9) {        // OFF → abu
+          ws[addr].s = xlStyle({ bg:XL_COLORS.OFF, fg:'4B5563', bold:true });
+        } else if (c===10) {       // CUTI → kuning
+          ws[addr].s = xlStyle({ bg:XL_COLORS.CUTI, fg:'854D0E', bold:true });
+        } else {                   // Tanggal/Hari/Keterangan → penanda hari
+          ws[addr].s = xlStyle({ bg: rowBg || XL_COLORS.WHITE, fg: rowBg?'FFFFFF':'1F2937', align: c===2?'left':'center', bold: c===0 });
         }
       });
     });
@@ -5364,7 +5404,7 @@ function exportShiftReportExcel() {
 
     const ws = XLSX.utils.aoa_to_sheet(aoa);
     ws['!merges'] = merges;
-    ws['!cols'] = [{wch:4},{wch:20},{wch:9}, ...dayMeta.map(()=>({wch:5}))];
+    ws['!cols'] = [{wch:4},{wch:22},{wch:9}, ...dayMeta.map(()=>({wch:7}))];
     ws['!rows'] = [{hpt:22},{hpt:18}];
     ws['!freeze'] = { xSplit:3, ySplit:2 };
     ws['!sheetView'] = [{ pane:{ topLeftCell:'D3', xSplit:3, ySplit:2, state:'frozen' } }];
