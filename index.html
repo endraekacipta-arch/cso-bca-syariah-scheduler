@@ -2593,16 +2593,34 @@ function renderKuotaTable() {
     totalOffNeeded += off;
     return { k, kq, off };
   });
-  // CORRECT formula: availableOFFs = nCso*days - kuotaSum - cutiSlots
-  // Feasible = targetOFFs (budget) <= availableOFFs
+  // CORRECT resign-aware formula
+  const resignMap2 = {};
+  state.resign.forEach((tgl, name) => { resignMap2[name] = tgl; });
+  const totalSlotTersedia2 = allDates2.reduce((s, k) => {
+    const d = parseInt(k.slice(8));
+    const nActive = state.csoList.filter(c => { const rd=resignMap2[c.name]; return !rd||d<rd; }).length;
+    return s + nActive;
+  }, 0);
+  const totalOFFCUTI2 = state.csoList.reduce((sum, c) => {
+    const rd = resignMap2[c.name];
+    const activeDays = rd ? rd - 1 : days;
+    const frac = activeDays / days;
+    return sum + Math.round(state.totalOff * frac) + Math.min(Math.round(state.totalCuti * frac), c.sisaCuti || 0);
+  }, 0);
   const totalKuotaSum2 = allDates2.reduce((s,k)=>{const q=state.kuota[k]||{};return s+(q.s6||0)+(q.s8||0)+(q.s9||0)+(q.s11||0)+(q.s13||0);},0);
-  const availableOFFs = nCso * days - totalKuotaSum2 - nCso * state.totalCuti;
-  const targetOFFs    = nCso * state.totalOff;
-  const surplus   = availableOFFs - targetOFFs; // positive = over-feasible (too many OFF slots)
-  const deficit   = targetOFFs - availableOFFs;  // positive = infeasible (too few OFF slots)
+  const availableOFFs = totalSlotTersedia2 - totalKuotaSum2 - (totalOFFCUTI2 - state.csoList.reduce((s,c)=>{
+    const rd=resignMap2[c.name]; const frac=rd?(rd-1)/days:1;
+    return s+Math.round(state.totalOff*frac);
+  },0));
+  const targetOFFs = state.csoList.reduce((s,c) => {
+    const rd=resignMap2[c.name]; const frac=rd?(rd-1)/days:1;
+    return s+Math.round(state.totalOff*frac);
+  }, 0);
+  const surplus   = availableOFFs - targetOFFs;
+  const deficit   = targetOFFs - availableOFFs;
   const feasible  = deficit <= 0;
-  const idealAvg  = Math.round(nCso * (1 - (state.totalOff + state.totalCuti)/days));
-  const minKuotaPerDay = Math.max(1, Math.floor(nCso - state.totalOff*nCso/days - state.totalCuti*nCso/days));
+  const idealAvg  = Math.round(totalSlotTersedia2/days * (1 - (state.totalOff + state.totalCuti)/days));
+  const minKuotaPerDay = Math.max(1, idealAvg);
   const suggestOff2 = nCso > 0 ? Math.ceil(totalOffNeeded/nCso) : 0;
   const wdDates = allDates2.filter(k=>{const d=new Date(state.year,state.month,parseInt(k.slice(8)));return !isWeekend(d)&&!state.holidays.has(k)&&!state.cb.has(k);});
   const weDates = allDates2.filter(k=>!wdDates.includes(k));
@@ -2711,21 +2729,45 @@ function renderKuotaTable() {
     let status = we ? 'Weekends' : (isHol ? 'Tanggal Merah' : (isCb ? 'Cuti Bersama' : 'Weekdays'));
 
     if (!state.kuota[k]) {
-      // Hitung exact kuota/hari secara matematis supaya konsisten
-      // slot kerja = nCSO*days - nCSO*totalOff - nCSO*totalCuti
-      // kuotaPerDay = slot kerja / days
-      const nC     = state.csoList.length || 30;
-      const dys    = daysInMonth(state.year, state.month);
-      const slotKerja  = nC * dys - nC * state.totalOff - nC * state.totalCuti;
-      const kuotaPerDay = Math.round(slotKerja / dys);
+      // Resign-aware kuota calculation
+      const dys = daysInMonth(state.year, state.month);
+      const allK = [];
+      for (let dd=1;dd<=dys;dd++) allK.push(dateKey(state.year,state.month,dd));
 
-      // Lock S6 dan S13 — weekday S6=6, weekend S6=5; S13=8 selalu
+      const resignMap2 = {};
+      state.resign.forEach((t,n)=>{ resignMap2[n]=t; });
+
+      const totalSlot2 = allK.reduce((s,kk)=>{
+        const dd2 = parseInt(kk.slice(8));
+        return s + state.csoList.filter(c=>{ const r=resignMap2[c.name]; return !r||dd2<r; }).length;
+      }, 0);
+      const totalOFFCUTI2 = state.csoList.reduce((s,c)=>{
+        const r=resignMap2[c.name];
+        const ad=r?r-1:dys;
+        const fr=ad/dys;
+        return s+Math.round(state.totalOff*fr)+Math.min(Math.round(state.totalCuti*fr),c.sisaCuti||0);
+      },0);
+      const nCsoAktifToday = state.csoList.filter(c=>{
+        const r=resignMap2[c.name]; return !r||d<r;
+      }).length;
+      const kuotaPerDay2 = Math.max(1, Math.floor((totalSlot2-totalOFFCUTI2)/dys));
+
+      // Flat CSO: on weekend/hol/cb, subtract from effective slot
+      const nFlatToday = (we||isHol||isCb) ? state.csoList.filter(c=>{
+        const isFlat = (state.flat||[]).some(f=>f.cso===c.name);
+        const r=resignMap2[c.name]; return isFlat&&(!r||d<r);
+      }).length : 0;
+
+      // ACC Request OFF today
+      const nAccToday = (state.requestOff||[]).filter(r=>r.acc&&r.tgl===d).length;
+
+      const nEffective = Math.max(1, nCsoAktifToday - nFlatToday - nAccToday);
+      const scaledKuota2 = Math.max(1, Math.floor(kuotaPerDay2 * nEffective / (state.csoList.length||1)));
+
       const s6wkd  = we ? 5 : 6;
       const s13fix = 8;
       const anchor = s6wkd + s13fix;
-      const sisa   = Math.max(0, kuotaPerDay - anchor);
-
-      // Sisa dibagi S8:S9:S11 = 2:1:2
+      const sisa   = Math.max(0, scaledKuota2 - anchor);
       const s8  = Math.max(1, Math.floor(sisa * 2/5));
       const s9  = Math.max(1, Math.floor(sisa * 1/5));
       const s11 = Math.max(1, sisa - s8 - s9);
@@ -2840,45 +2882,95 @@ function autoAdjustKuota() {
   const allDates = [];
   for (let d = 1; d <= days; d++) allDates.push(dateKey(state.year, state.month, d));
 
-  const totalKuotaSum = allDates.reduce((s,k) => {
-    const q = state.kuota[k]||{};
-    return s + (q.s6||0) + (q.s8||0) + (q.s9||0) + (q.s11||0) + (q.s13||0);
+  // Build resign map
+  const resignMap = {};
+  state.resign.forEach((tgl, name) => { resignMap[name] = tgl; });
+
+  // Compute nCsoAktif per day (exclude resigned)
+  const nCsoAktifPerDay = {};
+  allDates.forEach(k => {
+    const d = parseInt(k.slice(8));
+    nCsoAktifPerDay[k] = state.csoList.filter(c => {
+      const rd = resignMap[c.name];
+      return !rd || d < rd;
+    }).length;
+  });
+
+  // Total slot tersedia (sum of active CSO per day)
+  const totalSlotTersedia = allDates.reduce((s,k) => s + nCsoAktifPerDay[k], 0);
+
+  // Total OFF+CUTI yang dibutuhkan (prorate per CSO resign)
+  const totalOFFCUTI = state.csoList.reduce((sum, c) => {
+    const rd = resignMap[c.name];
+    const activeDays = rd ? rd - 1 : days;
+    const frac = activeDays / days;
+    return sum + Math.round(state.totalOff * frac)
+               + Math.min(Math.round(state.totalCuti * frac), c.sisaCuti || 0);
   }, 0);
 
-  const availableOFFs = nCso * days - totalKuotaSum - nCso * state.totalCuti;
-  const targetOFFs    = nCso * state.totalOff;
-  const surplus       = availableOFFs - targetOFFs;
-
-  if (surplus <= 0) {
-    renderKuotaTable();
-    notify('✅ Kuota sudah pas — tidak ada surplus.');
-    return;
-  }
-
-  // Hitung exact kuota/hari yang konsisten secara matematis
-  // slot kerja = nCSO*days - nCSO*totalOff - nCSO*totalCuti
-  // kuotaPerDay = slot kerja / days (sama untuk semua hari = Rule 2 compliant)
-  const slotKerja   = nCso * days - nCso * state.totalOff - nCso * state.totalCuti;
-  const kuotaPerDay = Math.round(slotKerja / days);
+  // Slot kerja yang ideal = total tersedia - OFF - CUTI
+  const slotKerja   = Math.max(1, totalSlotTersedia - totalOFFCUTI);
+  const kuotaPerDay = Math.max(1, Math.floor(slotKerja / days));
 
   // BCA Syariah: S6 + S13 dominate (~65% of total), rest split to S8/S9/S11
   // S6  ≈ 30% of kuotaPerDay
   // S13 ≈ 35% of kuotaPerDay
   // sisa ≈ 35% dibagi S8:S9:S11 = 2:1:2
+  // Count Flat CSOs active per day (auto-OFF on weekend/holiday/CB → reduce kuota those days)
+  const flatCsos = (state.flat||[]).map(f => f.cso);
+  const nFlatPerDay = {};
   allDates.forEach(k => {
-    const s6  = Math.max(1, Math.round(kuotaPerDay * 0.30));
-    const s13 = Math.max(1, Math.round(kuotaPerDay * 0.35));
-    const sisa = Math.max(0, kuotaPerDay - s6 - s13);
+    const d = parseInt(k.slice(8));
+    const date = new Date(state.year, state.month, d);
+    const isWE = isWeekend(date);
+    const isHol = state.holidays.has(k);
+    const isCb = state.cb.has(k);
+    if (isWE || isHol || isCb) {
+      nFlatPerDay[k] = state.csoList.filter(c => {
+        const f = (state.flat||[]).find(fl => fl.cso === c.name);
+        if (!f) return false;
+        const rd = resignMap[c.name];
+        return (!rd || d < rd);
+      }).length;
+    } else {
+      nFlatPerDay[k] = 0;
+    }
+  });
+
+  // Count ACC Request OFF per day
+  const nAccOffPerDay = {};
+  allDates.forEach(k => {
+    const d = parseInt(k.slice(8));
+    nAccOffPerDay[k] = (state.requestOff||[]).filter(r => r.acc && r.tgl === d).length;
+  });
+
+  allDates.forEach(k => {
+    const nActive = nCsoAktifPerDay[k] || nCso;
+    // Derive per-day kuota directly from nActive proportion of total slot kerja
+    // kuota[d] = floor(nActive[d] * slotKerja / totalSlotTersedia)
+    // This guarantees sum(kuota) ≤ slotKerja → OFF slots never under-counted
+    const nFlatOff = nFlatPerDay[k] || 0;
+    const nAccOff  = nAccOffPerDay[k] || 0;
+    const nEffective = Math.max(1, nActive - nFlatOff - nAccOff);
+    const scaledKuota = Math.max(1, Math.floor(nEffective * slotKerja / totalSlotTersedia));
+
+    const s6  = Math.max(1, Math.round(scaledKuota * 0.30));
+    const s13 = Math.max(1, Math.round(scaledKuota * 0.35));
+    const sisa = Math.max(0, scaledKuota - s6 - s13);
     const s8  = Math.max(1, Math.floor(sisa * 2/5));
     const s9  = Math.max(1, Math.floor(sisa * 1/5));
     const s11 = Math.max(1, sisa - s8 - s9);
     state.kuota[k] = { s6, s8, s9, s11, s13, total: s6+s8+s9+s11+s13 };
   });
 
+  const hasResign = state.resign.size > 0;
+  const hasFlat   = (state.flat||[]).length > 0;
+  const hasAcc    = (state.requestOff||[]).some(r => r.acc);
+  const factors   = [hasResign&&'resign', hasFlat&&'flat', hasAcc&&'ACC OFF'].filter(Boolean).join(', ');
   renderKuotaTable();
   const s6ex  = Math.max(1, Math.round(kuotaPerDay * 0.30));
   const s13ex = Math.max(1, Math.round(kuotaPerDay * 0.35));
-  notify(`✅ Auto-Adjust — ${kuotaPerDay}/hari. S6≈${s6ex}, S13≈${s13ex} (dominan). Sisanya S8/S9/S11.`);
+  notify(`✅ Auto-Adjust — rata-rata ${kuotaPerDay}/hari${factors?` (mempertimbangkan: ${factors})`:''}. S6≈${s6ex}, S13≈${s13ex}.`);
 }
 
 // ============================================================
@@ -3448,7 +3540,56 @@ function generateInternal() {
   runBalancing(60);
   runSameDay(80);
 
-  // ── R1A cleanup pass: re-assign any shift that violates Rule 1A ──────────
+  // ── Cross-day OFF balancing: fix CSOs still under target OFF ────────────
+  // runSameDay only swaps within same day — this pass moves OFF across days
+  let offFixed = true, offPass = 0;
+  while (offFixed && offPass < 20) {
+    offFixed = false; offPass++;
+    state.csoList.forEach(c => {
+      const actualOff = getOff(c.id);
+      if (actualOff >= cm[c.id].tOff) return; // already met target
+      const deficit = cm[c.id].tOff - actualOff;
+      // Find best days to convert work→OFF for this CSO
+      // Priority: days where kuota over-supplied (actual workers > target)
+      let converted = 0;
+      for (const k of allDates) {
+        if (converted >= deficit) break;
+        const v = schedule[c.id][k];
+        if (!isW(v)) continue;         // already OFF/CUTI/RESIGN
+        if (!canMove(c.id, k)) continue;
+        if (makes3(c.id, k)) continue; // would create 3-consec OFF
+        if (offBreaksR1A(c.id, k)) continue;
+        // Check if this day has over-supply (safe to reduce 1 worker)
+        const dayWorkers = state.csoList.filter(cc => isW(schedule[cc.id][k])).length;
+        const kuotaDay = (state.kuota[k]||{});
+        const kuotaTarget = (kuotaDay.s6||0)+(kuotaDay.s8||0)+(kuotaDay.s9||0)+(kuotaDay.s11||0)+(kuotaDay.s13||0);
+        if (dayWorkers > kuotaTarget) {
+          // Over-supplied day — safe to convert this CSO to OFF
+          schedule[c.id][k] = 'OFF';
+          runningOff[c.id]++;
+          offFixed = true;
+          converted++;
+        }
+      }
+      // If still not enough, try any workday (accept neutral supply impact)
+      if (converted < deficit) {
+        for (const k of allDates) {
+          if (converted >= deficit) break;
+          const v = schedule[c.id][k];
+          if (!isW(v)) continue;
+          if (!canMove(c.id, k)) continue;
+          if (makes3(c.id, k)) continue;
+          if (offBreaksR1A(c.id, k)) continue;
+          schedule[c.id][k] = 'OFF';
+          runningOff[c.id]++;
+          offFixed = true;
+          converted++;
+        }
+      }
+    });
+  }
+
+
   allDates.forEach((k, dayIdx)=>{
     if(dayIdx===0)return;
     const yKey=allDates[dayIdx-1];
@@ -3624,7 +3765,10 @@ function validateSchedule(schedule, dayMeta) {
     });
 
     // Rule 2: Validate OFF count per CSO
-    // Only flag under-OFF as real violation (over-OFF = unavoidable surplus from kuota)
+    // For resign CSOs, use prorated target (_targetOff), not full totalOff
+    const isResign = state.resign.has(cso.name);
+    const r2TargetOff  = (cso._targetOff  !== undefined) ? cso._targetOff  : state.totalOff;
+    const r2TargetCuti = (cso._targetCuti !== undefined) ? cso._targetCuti : state.totalCuti;
     let offCount = 0, cutiCount = 0;
     allDates.forEach(k => {
       const v = sched[k];
@@ -3632,24 +3776,22 @@ function validateSchedule(schedule, dayMeta) {
       if (v === 'CUTI') cutiCount++;
     });
     
-    if (offCount < state.totalOff) {
-      // Under-OFF: genuine shortage — flag as R2
+    if (offCount < r2TargetOff) {
       violations.push({
         csoId: cso.id, name: cso.name, type: 'Rule 2',
-        msg: `${cso.name}: OFF=${offCount} (expected ${state.totalOff}), kurang ${state.totalOff-offCount} hari`
+        msg: `${cso.name}: OFF=${offCount} (expected ${r2TargetOff}${isResign?' prorated':''}), kurang ${r2TargetOff-offCount} hari`
       });
-    } else if (offCount > state.totalOff) {
-      // Over-OFF: surplus from kuota config — flag as info (R2-surplus)
+    } else if (offCount > r2TargetOff) {
       violations.push({
         csoId: cso.id, name: cso.name, type: 'Rule 2',
         severity: 'info',
-        msg: `${cso.name}: OFF=${offCount} (target ${state.totalOff}), surplus ${offCount-state.totalOff} hari — kuota perlu dikurangi ${offCount-state.totalOff} hari`
+        msg: `${cso.name}: OFF=${offCount} (target ${r2TargetOff}${isResign?' prorated':''}), surplus ${offCount-r2TargetOff} hari`
       });
     }
-    if (cutiCount !== state.totalCuti) {
+    if (cutiCount !== r2TargetCuti) {
       violations.push({
         csoId: cso.id, name: cso.name, type: 'Rule 2',
-        msg: `${cso.name}: CUTI=${cutiCount} (expected ${state.totalCuti})`
+        msg: `${cso.name}: CUTI=${cutiCount} (expected ${r2TargetCuti}${isResign?' prorated':''})`
       });
     }
 
@@ -3711,25 +3853,37 @@ function validateSchedule(schedule, dayMeta) {
   allDates.forEach(k => {
     const kuota = state.kuota[k] || { total: 0, s6: 0, s8: 0, s9: 0, s11: 0, s13: 0 };
     const kuotaTotal = (kuota.s6||0)+(kuota.s8||0)+(kuota.s9||0)+(kuota.s11||0)+(kuota.s13||0);
+
+    // Count only active (non-RESIGN) CSOs for this day
+    const nActive = state.csoList.filter(c => schedule[c.id][k] !== 'RESIGN').length;
     const cutiToday  = state.csoList.filter(c => schedule[c.id][k]==='CUTI').length;
     const actualWork = state.csoList.filter(c => {
       const v = schedule[c.id][k];
       return v && v!=='OFF'&&v!=='CUTI'&&v!=='RESIGN'&&!v.match(/^(BB|TK|CCT|CSPV|CM|SAKIT)/);
     }).length;
 
-    // Rule 9: total workers > kuota (over-supply)
-    if (actualWork > kuotaTotal) {
+    // Effective kuota = min(configured kuota, active CSO - CUTI)
+    const effectiveKuota = Math.min(kuotaTotal, nActive - cutiToday);
+
+    // Rule 9: total workers > effectiveKuota (over-supply)
+    if (actualWork > effectiveKuota) {
       violations.push({
         csoId: null, name: 'SYSTEM', type: 'Rule 7',
-        msg: `tgl ${dayMeta[k].day}: OVER-SUPPLY — kuota ${kuotaTotal} tapi ${actualWork} CSO masuk (lebih ${actualWork-kuotaTotal})`
+        msg: `tgl ${dayMeta[k].day}: OVER-SUPPLY — kuota ${effectiveKuota} tapi ${actualWork} CSO masuk (lebih ${actualWork-effectiveKuota})`
       });
     }
 
-    // Rule 7: per-shift under-supply
+    // Rule 7: per-shift under-supply (skip if CSO aktif tidak cukup)
     const shiftDefs = [['s6','S6'],['s8','S8'],['s9','S9'],['s11','S11'],['s13','S13']];
     shiftDefs.forEach(([qKey, sName]) => {
-      const target = kuota[qKey] || 0;
+      let target = kuota[qKey] || 0;
       if (target === 0) return;
+      // Scale down target proportionally if resigned CSOs reduce active count
+      if (nActive < state.csoList.length) {
+        const scale = nActive / state.csoList.length;
+        target = Math.max(0, Math.round(target * scale));
+        if (target === 0) return;
+      }
       const lvl = shiftLevel(sName);
       const actual = state.csoList.filter(c => {
         const v = schedule[c.id][k];
@@ -3796,14 +3950,44 @@ function _renderFeasibilityWarning() {
   if (!nCso) { el.innerHTML = ''; return; }
 
   const days  = daysInMonth(state.year, state.month);
+
+  // Build resign map
+  const resignMap = {};
+  state.resign.forEach((tgl, name) => { resignMap[name] = tgl; });
+
+  // Total slot tersedia per hari (resign-aware)
   let totalOffNeeded = 0;
   for (let d = 1; d <= days; d++) {
     const k = dateKey(state.year, state.month, d);
     const q = state.kuota[k] || {};
     const kuotaDay = (q.s6||0)+(q.s8||0)+(q.s9||0)+(q.s11||0)+(q.s13||0);
-    totalOffNeeded += Math.max(0, nCso - kuotaDay);
+    // nActive = CSO yang belum resign hari ini
+    const nActive = state.csoList.filter(c => {
+      const rd = resignMap[c.name]; return !rd || d < rd;
+    }).length;
+    // Flat CSO otomatis OFF di weekend/TM/CB
+    const date2 = new Date(state.year, state.month, d);
+    const isWE2 = isWeekend(date2);
+    const isHol2 = state.holidays.has(k);
+    const isCb2  = state.cb.has(k);
+    const nFlat = (isWE2||isHol2||isCb2) ? (state.flat||[]).filter(f => {
+      const rd = resignMap[f.cso]; return !rd || d < rd;
+    }).length : 0;
+    // ACC OFF
+    const nAcc = (state.requestOff||[]).filter(r => r.acc && r.tgl === d).length;
+    // Effective slots = active - flat - acc
+    const nEffective = Math.max(0, nActive - nFlat - nAcc);
+    totalOffNeeded += Math.max(0, nEffective - kuotaDay);
   }
-  const totalOffBudget = nCso * (state.totalOff + state.totalCuti);
+
+  // Total OFF budget (prorate resign CSO)
+  const totalOffBudget = state.csoList.reduce((sum, c) => {
+    const rd = resignMap[c.name];
+    const activeDays = rd ? rd - 1 : days;
+    const frac = activeDays / days;
+    return sum + Math.round(state.totalOff * frac) + Math.min(Math.round(state.totalCuti * frac), c.sisaCuti||0);
+  }, 0);
+
   const deficit  = totalOffNeeded - totalOffBudget;
   const feasible = deficit <= 0;
 
@@ -3812,12 +3996,17 @@ function _renderFeasibilityWarning() {
   const suggestOff   = Math.ceil(totalOffNeeded / nCso);
   const suggestKuota = Math.floor(totalOffBudget / days);
   const extraPerCso  = (deficit / nCso).toFixed(1);
+  const factors = [
+    state.resign.size > 0 && `${state.resign.size} resign`,
+    (state.flat||[]).length > 0 && `${(state.flat||[]).length} flat`,
+    (state.requestOff||[]).some(r=>r.acc) && 'ACC OFF',
+  ].filter(Boolean).join(', ');
 
   el.innerHTML = `
     <div style="background:#FEF2F2;border:1px solid #FECACA;border-left:4px solid var(--danger);
       border-radius:8px;padding:14px 18px;margin-bottom:16px;font-size:12px;line-height:1.9;">
       <div style="font-weight:800;color:var(--danger);font-size:13px;margin-bottom:8px;">
-        ⚠ Konfigurasi OFF &amp; Kuota Tidak Konsisten
+        ⚠ Konfigurasi OFF &amp; Kuota Tidak Konsisten${factors?` <span style="font-size:11px;font-weight:400;">(sudah mempertimbangkan: ${factors})</span>`:''}
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:4px 20px;margin-bottom:10px;">
         <div>Total slot OFF dibutuhkan: <b style="color:var(--danger)">${totalOffNeeded}</b></div>
@@ -3826,13 +4015,11 @@ function _renderFeasibilityWarning() {
         <div>OFF ekstra per CSO: <b style="color:var(--danger)">≈ +${extraPerCso} hari</b></div>
       </div>
       <div style="background:#fff;border-radius:6px;padding:10px 12px;border:1px solid #FECACA;font-size:11.5px;">
-        <b style="color:var(--danger)">Akibatnya:</b> banyak CSO mendapat OFF lebih dari ${state.totalOff} hari (lihat violation R2 di atas).<br>
+        <b style="color:var(--danger)">Akibatnya:</b> banyak CSO mendapat OFF lebih dari target.<br>
         <b>Solusi — pilih salah satu:</b><br>
-        &nbsp;&nbsp;① Buka <b>Step 1</b> → naikkan OFF per CSO dari <b>${state.totalOff}</b> ke minimal
-          <b style="color:var(--success);font-size:13px;">${suggestOff}</b> hari<br>
-        &nbsp;&nbsp;② Buka <b>Step 5</b> → naikkan rata-rata kuota harian ke minimal
-          <b style="color:var(--success);font-size:13px;">${suggestKuota}</b> CSO/hari<br>
-        &nbsp;&nbsp;③ Kombinasi keduanya
+        &nbsp;&nbsp;① Buka <b>Step 1</b> → naikkan OFF per CSO ke minimal <b style="color:var(--success);font-size:13px;">${suggestOff}</b> hari<br>
+        &nbsp;&nbsp;② Buka <b>Step 5</b> → naikkan rata-rata kuota ke minimal <b style="color:var(--success);font-size:13px;">${suggestKuota}</b> CSO/hari<br>
+        &nbsp;&nbsp;③ Klik <b>⚡ Auto-Adjust</b> — otomatis sesuaikan kuota dengan semua faktor
       </div>
     </div>`;
 }
@@ -3953,9 +4140,20 @@ function renderScheduleTable() {
     else if (isWeekend(date)) cls = 'style="background: #FEF3C7; color: black;"';
     html += `<th ${cls}>${d}<br><span style="font-size: 10px;">${DAYS[date.getDay()]}</span></th>`;
   }
+  html += '<th style="background:#1B5E3F;color:white;min-width:52px;">Kerja</th>';
+  html += '<th style="background:#4B5563;color:white;min-width:44px;">OFF</th>';
+  html += '<th style="background:#92400E;color:white;min-width:44px;">CUTI</th>';
   html += '</tr></thead><tbody>';
 
+  // Per-day counts for footer row
+  const dayWork = {}, dayOff = {}, dayCuti = {};
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    dayWork[k] = 0; dayOff[k] = 0; dayCuti[k] = 0;
+  }
+
   state.csoList.forEach(c => {
+    let cWork = 0, cOff = 0, cCuti = 0;
     html += `<tr><td class="name-cell">${escape(c.name)}</td>`;
     for (let d = 1; d <= days; d++) {
       const k = dateKey(state.year, state.month, d);
@@ -3963,12 +4161,13 @@ function renderScheduleTable() {
       let cls = 'cell-shift';
       let label = v || '-';
       
-      if (v === 'OFF') { cls = 'cell-off'; label = 'OFF'; }
-      else if (v === 'CUTI') { cls = 'cell-cuti'; label = 'CUTI'; }
+      if (v === 'OFF') { cls = 'cell-off'; label = 'OFF'; cOff++; dayOff[k]++; }
+      else if (v === 'CUTI') { cls = 'cell-cuti'; label = 'CUTI'; cCuti++; dayCuti[k]++; }
       else if (v === 'RESIGN') { cls = 'cell-resign'; label = 'RESIGN'; }
-      else if (v && v.match(/^(BB|TK|CCT|CSPV|CM|SAKIT)$/)) { cls = 'cell-khusus'; } // Keep original label
-      else if (v && v.endsWith('X')) cls = 'cell-shift-x';
-      else if (v && v.endsWith('L')) cls = 'cell-shift-l';
+      else if (v && v.match(/^(BB|TK|CCT|CSPV|CM|SAKIT)$/)) { cls = 'cell-khusus'; cWork++; dayWork[k]++; }
+      else if (v && v.endsWith('X')) { cls = 'cell-shift-x'; cWork++; dayWork[k]++; }
+      else if (v && v.endsWith('L')) { cls = 'cell-shift-l'; cWork++; dayWork[k]++; }
+      else if (v && v !== '-') { cWork++; dayWork[k]++; }
       
       const _locked = (v === 'RESIGN') || (v && v.match(/^(BB|TK|CCT|CSPV|CM|SAKIT)/));
       const _edited  = state.manualEdits && state.manualEdits[c.id + '||' + k];
@@ -3979,8 +4178,46 @@ function renderScheduleTable() {
         html += `<td class="${cls}" data-cso="${c.id}" onclick="event.stopPropagation(); openCellEditor('${c.id}','${k}',this)">${label}</td>`;
       }
     }
-    html += '</tr>';
+  // Right summary columns per CSO — with target indication
+  const targetOff  = c._targetOff  !== undefined ? c._targetOff  : state.totalOff;
+  const targetCuti = c._targetCuti !== undefined ? c._targetCuti : state.totalCuti;
+  const offColor  = cOff  < targetOff  ? 'var(--danger)' : cOff  > targetOff  ? '#92400E' : '#1B5E3F';
+  const cutiColor = cCuti < targetCuti ? 'var(--danger)' : '#92400E';
+  html += `<td style="font-weight:700;color:#1B5E3F;text-align:center;background:#F0FDF4;">${cWork}</td>`;
+  html += `<td style="font-weight:700;color:${offColor};text-align:center;background:#F9FAFB;" title="Target: ${targetOff}">${cOff}<span style="font-size:9px;color:var(--muted)">/${targetOff}</span></td>`;
+  html += `<td style="font-weight:700;color:${cutiColor};text-align:center;background:#FEF9C3;" title="Target: ${targetCuti}">${cCuti}<span style="font-size:9px;color:var(--muted)">/${targetCuti}</span></td>`;
+  html += '</tr>';
   });
+
+  // Footer rows: CSO masuk, OFF, CUTI per tanggal
+  // Row 1: CSO Masuk (kerja)
+  html += `<tr style="position:sticky;bottom:0;background:#F0FDF4;font-weight:700;font-size:11px;">`;
+  html += `<td class="name-cell" style="font-weight:700;color:#1B5E3F;">👷 CSO Masuk</td>`;
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    const kuotaTarget = (state.kuota[k] ? (state.kuota[k].s6||0)+(state.kuota[k].s8||0)+(state.kuota[k].s9||0)+(state.kuota[k].s11||0)+(state.kuota[k].s13||0) : 0);
+    const color = dayWork[k] < kuotaTarget ? 'var(--danger)' : '#1B5E3F';
+    html += `<td style="text-align:center;color:${color};font-weight:700;">${dayWork[k]}</td>`;
+  }
+  html += `<td></td><td></td><td></td></tr>`;
+
+  // Row 2: OFF per hari
+  html += `<tr style="background:#F9FAFB;font-weight:600;font-size:10px;">`;
+  html += `<td class="name-cell" style="font-weight:600;color:#4B5563;">🌙 OFF</td>`;
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    html += `<td style="text-align:center;color:#4B5563;">${dayOff[k]}</td>`;
+  }
+  html += `<td></td><td></td><td></td></tr>`;
+
+  // Row 3: CUTI per hari
+  html += `<tr style="background:#FEF9C3;font-weight:600;font-size:10px;">`;
+  html += `<td class="name-cell" style="font-weight:600;color:#92400E;">🏖 CUTI</td>`;
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    html += `<td style="text-align:center;color:#92400E;">${dayCuti[k]}</td>`;
+  }
+  html += `<td></td><td></td><td></td></tr>`;
 
   html += '</tbody>';
   document.getElementById('scheduleTable').innerHTML = html;
