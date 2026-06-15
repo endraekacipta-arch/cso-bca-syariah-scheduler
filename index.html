@@ -3868,29 +3868,42 @@ function validateSchedule(schedule, dayMeta) {
       });
     }
 
-    // Rule 7: per-shift under-supply (skip if CSO aktif tidak cukup)
+    // Rule 7: per-shift under-supply
+    // Bedakan 2 kasus:
+    //  (a) Total orang masuk < total kuota → benar2 kurang headcount (laporkan)
+    //  (b) Total orang masuk = total kuota, hanya distribusi antar-shift geser
+    //      → tak terhindarkan (mis. setelah resign), JANGAN laporkan per-shift.
     const shiftDefs = [['s6','S6'],['s8','S8'],['s9','S9'],['s11','S11'],['s13','S13']];
-    shiftDefs.forEach(([qKey, sName]) => {
-      let target = kuota[qKey] || 0;
-      if (target === 0) return;
-      // Scale down target proportionally if resigned CSOs reduce active count
-      if (nActive < state.csoList.length) {
-        const scale = nActive / state.csoList.length;
-        target = Math.max(0, Math.round(target * scale));
-        if (target === 0) return;
-      }
+    let sumTarget = 0, sumActual = 0;
+    const perShift = shiftDefs.map(([qKey, sName]) => {
+      const target = kuota[qKey] || 0;
       const lvl = shiftLevel(sName);
-      const actual = state.csoList.filter(c => {
-        const v = schedule[c.id][k];
-        return v && shiftLevel(v) === lvl;
-      }).length;
-      if (actual < target) {
+      const actual = state.csoList.filter(c => shiftLevel(schedule[c.id][k]) === lvl).length;
+      sumTarget += target; sumActual += actual;
+      return { sName, target, actual };
+    });
+
+    // headcountShort = kekurangan orang secara total (bukan sekadar distribusi)
+    const headcountShort = Math.max(0, sumTarget - sumActual);
+
+    if (headcountShort > 0) {
+      // Ada kekurangan headcount nyata. Laporkan per-shift, tapi batasi total
+      // yang dilaporkan = headcountShort (sisanya cuma distribusi, abaikan).
+      let remaining = headcountShort;
+      perShift.forEach(({ sName, target, actual }) => {
+        if (remaining <= 0) return;
+        if (target === 0 || actual >= target) return;
+        const kurang = Math.min(target - actual, remaining);
+        remaining -= kurang;
         violations.push({
           csoId: null, name: 'SYSTEM', type: 'Rule 7',
-          msg: `tgl ${dayMeta[k].day}: ${sName} butuh ${target}, terisi ${actual} (kurang ${target-actual})`
+          msg: `tgl ${dayMeta[k].day}: ${sName} butuh ${target}, terisi ${actual} (kurang ${kurang})`
         });
-      }
-    });
+      });
+    }
+    // Jika headcountShort === 0 → jumlah orang sudah pas, hanya distribusi antar
+    // shift yang berbeda dari target ideal. Ini konsekuensi resign/OFF, BUKAN
+    // pelanggaran → tidak ada violation per-shift.
   });
 
   return violations;
@@ -4164,7 +4177,7 @@ function renderScheduleTable() {
       else if (v && v.endsWith('L')) { cls = 'cell-shift-l'; cWork++; dayWork[k]++; }
       else if (v && v !== '-') { cWork++; dayWork[k]++; }
       
-      const _locked = (v === 'RESIGN') || (v && v.match(/^(BB|TK|CCT|CSPV|CM|SAKIT)/));
+      const _locked = (v === 'RESIGN') || (v && v.match(/^(BB|TK|CCT|CSPV)$/));
       const _edited  = state.manualEdits && state.manualEdits[c.id + '||' + k];
       if (_edited) cls += ' cell-edited';
       if (_locked) {
