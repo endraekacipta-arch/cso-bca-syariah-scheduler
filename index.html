@@ -595,6 +595,7 @@ textarea {
 
 .cell-shift { background: var(--surface); color: var(--primary); }
 .cell-off { background: #EEF2FF; color: var(--text-secondary); }
+.cell-off-req { background: #93C5FD; color: #1E3A5F; font-weight: 600; }
 .cell-cuti { background: #FEF3C7; color: #92400E; }
 .cell-shift-l { background: #FFE4E6; color: #BE123C; }
 .cell-shift-x { background: #DBEAFE; color: #0C4A6E; }
@@ -3035,6 +3036,9 @@ function generateInternal() {
   const days = daysInMonth(state.year, state.month);
   const rand = rng(42);
 
+  // Tracking OFF yang berasal dari request (ACC maupun Pending) — key: csoId+'||'+dk
+  state.requestOffScheduled = new Set();
+
   // ── Day metadata ─────────────────────────────────────────────────────────
   const dayMeta = {};
   for (let d = 1; d <= days; d++) {
@@ -3126,7 +3130,7 @@ function generateInternal() {
       const jk=(state.jadwalKhusus||[]).find(j=>j.cso===c.name&&j.tgl===meta.day);
       if(jk){schedule[c.id][k]=jk.kode;return;}
       if(m.cutiSet.has(k)){schedule[c.id][k]='CUTI';return;}
-      if(m.reqOffSet.has(k)){schedule[c.id][k]='OFF'; runningOff[c.id]++; return;}
+      if(m.reqOffSet.has(k)){schedule[c.id][k]='OFF'; runningOff[c.id]++; state.requestOffScheduled.add(c.id+'||'+k); return;}
       if(m.flatRule&&meta.day>=m.flatRule.from&&meta.day<=m.flatRule.to
          &&(meta.isWeekend||meta.isHoliday||meta.isCb)){schedule[c.id][k]='OFF'; runningOff[c.id]++; return;}
     });
@@ -3246,7 +3250,7 @@ function generateInternal() {
       // if no safe winner found, fixStreaks (Phase 3) will attempt cleanup later
     }
 
-    softWinners.forEach(c=>{ schedule[c.id][k]='OFF'; runningOff[c.id]++; });
+    softWinners.forEach(c=>{ schedule[c.id][k]='OFF'; runningOff[c.id]++; state.requestOffScheduled.add(c.id+'||'+k); });
     noReqWinners.forEach(c=>{ schedule[c.id][k]='OFF'; runningOff[c.id]++; });
 
     // softLosers: pending request lost this slot → relocate OFF to least-contested day
@@ -4169,7 +4173,7 @@ function renderScheduleTable() {
       let cls = 'cell-shift';
       let label = v || '-';
       
-      if (v === 'OFF') { cls = 'cell-off'; label = 'OFF'; cOff++; dayOff[k]++; }
+      if (v === 'OFF') { const isReqOff = !!(state.requestOffScheduled && state.requestOffScheduled.has(c.id+'||'+k)); cls = isReqOff ? 'cell-off-req' : 'cell-off'; label = 'OFF'; cOff++; dayOff[k]++; }
       else if (v === 'CUTI') { cls = 'cell-cuti'; label = 'CUTI'; cCuti++; dayCuti[k]++; }
       else if (v === 'RESIGN') { cls = 'cell-resign'; label = 'RESIGN'; }
       else if (v && v.match(/^(BB|TK|CCT|CSPV|CM|SAKIT)$/)) { cls = 'cell-khusus'; cWork++; dayWork[k]++; }
@@ -5180,6 +5184,7 @@ function renderShiftReport() {
 const XL_COLORS = {
   // Shift biasa = putih. Status khusus saja yang berwarna.
   OFF:    'D1D5DB',   // abu-abu
+  OFF_REQ:'93C5FD',   // abu-abu kebiruan (OFF dari request)
   CUTI:   'FDE68A',   // kuning
   EDITED: 'FDE68A',   // kuning (sama dgn cuti, hanya pembeda dari shift)
   CMSAKIT:'FCA5A5',   // merah (CM / SAKIT)
@@ -5208,10 +5213,11 @@ function xlStyle(opts) {
   return s;
 }
 
-function shiftCellStyle(val, dayMeta, isEdited) {
+function shiftCellStyle(val, dayMeta, isEdited, isOffReq) {
   if (!val) return xlStyle({});
   // Edit manual → kuning (override warna shift, biar kelihatan diubah)
   if (isEdited) return xlStyle({ bg: XL_COLORS.EDITED, fg:'1F2937', bold:true });
+  if (val === 'OFF' && isOffReq) return xlStyle({ bg: XL_COLORS.OFF_REQ, fg:'1E3A5F', bold:true });
   if (val === 'OFF')    return xlStyle({ bg: XL_COLORS.OFF, fg:'4B5563', italic:true });
   if (val === 'CUTI')   return xlStyle({ bg: XL_COLORS.CUTI, fg:'854D0E', bold:true });
   if (val === 'CM' || val === 'SAKIT') return xlStyle({ bg: XL_COLORS.CMSAKIT, fg:'7F1D1D', bold:true });
@@ -5320,8 +5326,9 @@ function exportShiftReportExcel() {
       dayMeta.forEach((m,di) => {
         const addr = XLSX.utils.encode_cell({r, c:4+di});
         const v = (state.schedule[c.id]||{})[m.k] || '';
-        const isEd = !!(state.manualEdits && state.manualEdits[c.id + '||' + m.k]);
-        if (ws[addr]) ws[addr].s = shiftCellStyle(v, m, isEd);
+        const isEd    = !!(state.manualEdits && state.manualEdits[c.id + '||' + m.k]);
+        const isOffReq = !!(state.requestOffScheduled && state.requestOffScheduled.has(c.id + '||' + m.k));
+        if (ws[addr]) ws[addr].s = shiftCellStyle(v, m, isEd, isOffReq);
       });
       // Total cols — warnai sesuai legend: Total Kerja putih, OFF abu, CUTI kuning
       const totAddr = XLSX.utils.encode_cell({r, c:4+days});
