@@ -1456,7 +1456,7 @@ Citra Dewi
 
     <div style="display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; align-items:center;">
       <button class="btn btn-primary btn-small" onclick="exportShiftReportExcel()">📊 Export Excel</button>
-      <span style="font-size:11px;color:var(--muted);">Berisi 3 sheet: Jadwal · Shift Report · Istirahat (terformat)</span>
+      <span style="font-size:11px;color:var(--muted);">Berisi 4 sheet: Jadwal · Shift Report · Istirahat · Insentif</span>
       <button class="btn btn-secondary btn-small" id="btnResetEdits" onclick="resetAllEdits()" style="display:none;">
         ↩ Reset Edit (<span id="editCount">0</span>)
       </button>
@@ -1599,7 +1599,27 @@ function daysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
 function dateKey(y, m, d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 function parseKey(k) { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d); }
 function isWeekend(date) { const d = date.getDay(); return d === 0 || d === 6; }
-function shiftLevel(s) { const m = s.match(/^S(\d+)/); return m ? parseInt(m[1]) : null; }
+function shiftLevel(s) { const m = s && s.match(/^S(\d+)/); return m ? parseInt(m[1]) : null; }
+
+// Hitung insentif satu hari (weekday/weekend aware)
+function calcInsentif(val, meta) {
+  if (!val || val === 'OFF' || val === 'CUTI' || val === 'RESIGN') return 0;
+  if (/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(val)) return 0;
+  const base = val.replace(/[LX]$/, '');
+  const isOffDay = meta.isWeekend || meta.isHoliday || meta.isCb;
+  if (isOffDay) {
+    return { S6:120000, S8:100000, S9:100000, S11:110000, S13:110000 }[base] || 0;
+  } else {
+    return { S6:100000, S11:80000, S13:80000 }[base] || 0;
+  }
+}
+
+// Format rupiah ringkas
+function fmtRupiah(n) {
+  if (n >= 1000000) return (n/1000000).toLocaleString('id-ID',{maximumFractionDigits:2}) + 'jt';
+  if (n >= 1000)    return (n/1000).toLocaleString('id-ID',{maximumFractionDigits:0}) + 'rb';
+  return 'Rp' + n;
+}
 function rng(seed) { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 function pickRandom(arr, n, rand) {
   const a = [...arr];
@@ -3106,6 +3126,10 @@ function generateInternal() {
   const runningOff = {};
   state.csoList.forEach(c=>{ runningOff[c.id]=0; });
 
+  // Track insentif per CSO untuk balancing (opsi B)
+  const runningInsentif = {};
+  state.csoList.forEach(c=>{ runningInsentif[c.id]=0; });
+
   // Helper: consecutive work streak up to day before dayIdx
   const streakBefore = (id, dayIdx) => {
     let s=0;
@@ -3166,6 +3190,14 @@ function generateInternal() {
       const bPace = runningOff[b.id]/(dayIdx+1) - cm[b.id].tOff/allDates.length;
       if(Math.abs(aPace-bPace)>0.02) return bPace-aPace;
 
+      // Insentif lag: CSO yang jauh di bawah rata-rata → diprioritaskan ke depan pool
+      // supaya dapat shift bernilai tinggi lebih dulu (balancing opsi B)
+      const avgInsentif = state.csoList.reduce((s,x)=>s+(runningInsentif[x.id]||0),0) / Math.max(state.csoList.length,1);
+      const aLag = avgInsentif - (runningInsentif[a.id]||0);
+      const bLag = avgInsentif - (runningInsentif[b.id]||0);
+      // CSO yang lebih tertinggal (lag lebih besar) → ke depan (nilai lebih kecil di sort)
+      if (Math.abs(aLag - bLag) > 5000) return bLag - aLag; // threshold 5rb supaya tidak override R1A
+
       return (minL[a.id]||0)-(minL[b.id]||0);
     });
 
@@ -3184,6 +3216,8 @@ function generateInternal() {
         }
       }
       schedule[cso.id][k]=sh+suffix;
+      // Track insentif untuk balancing
+      runningInsentif[cso.id] = (runningInsentif[cso.id]||0) + calcInsentif(sh+suffix, meta);
     };
 
     let wi=0;
@@ -3455,6 +3489,45 @@ function generateInternal() {
               po=p2; break;
             }
           }
+          // Special case: jika posisi yang perlu di-OFF adalah CUTI,
+          // coba relokasi CUTI ke hari weekday lain yang aman
+          if(po !== -1 && schedule[cso.id][allDates[po]] === 'CUTI') {
+            const cutiK = allDates[po];
+            // Cari hari weekday alternatif untuk CUTI: bukan weekend/libur/cb,
+            // belum CUTI/OFF/RESIGN/khusus, tidak membentuk streak baru ke-6
+            const altCuti = allDates.find(ak => {
+              if (ak === cutiK) return false;
+              const am = dayMeta[ak];
+              if (am.isWeekend || am.isHoliday || am.isCb) return false;
+              const av = schedule[cso.id][ak];
+              if (!av || av === 'OFF' || av === 'CUTI' || av === 'RESIGN') return false;
+              if (/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(av)) return false;
+              if (cm[cso.id].reqOffSet.has(ak) || cm[cso.id].jkSet.has(ak)) return false;
+              // Pastikan tidak membuat streak baru > 5 di sekitar altCuti
+              const ai = allDates.indexOf(ak);
+              let testStreak = 0, maxTs = 0;
+              for (let ti = Math.max(0,ai-5); ti <= Math.min(allDates.length-1,ai+5); ti++) {
+                const tv = ti === ai ? 'CUTI' : schedule[cso.id][allDates[ti]];
+                if (isWorkStreak(tv)) { testStreak++; maxTs = Math.max(maxTs, testStreak); }
+                else testStreak = 0;
+              }
+              return maxTs <= 5;
+            });
+            if (altCuti) {
+              // Tukar: CUTI pindah ke altCuti, posisi lama jadi OFF
+              const oldShift = schedule[cso.id][altCuti];
+              schedule[cso.id][altCuti] = 'CUTI';
+              schedule[cso.id][cutiK]   = 'OFF';
+              // Update cutiSet & runningOff
+              cm[cso.id].cutiSet.delete(cutiK);
+              cm[cso.id].cutiSet.add(altCuti);
+              runningOff[cso.id]++;
+              ch = true; streak = 0; continue;
+            }
+            // Tidak ada altCuti aman → fallthrough, biarkan violation
+            streak = 0; continue;
+          }
+
           if(po===-1){streak=0;continue;}
 
           // Try kuota-neutral: find CSO Y (OFF on po, can work) to replace
@@ -3601,6 +3674,12 @@ function generateInternal() {
       const sh=bestShift(c.id,k);
       if(sh) schedule[c.id][k]=sh;
     });
+  });
+
+  // Simpan total insentif per CSO ke state untuk tampilan & export
+  state.insentifPerCso = {};
+  state.csoList.forEach(cso => {
+    state.insentifPerCso[cso.id] = runningInsentif[cso.id] || 0;
   });
 
   return { schedule, violations: validateSchedule(schedule, dayMeta) };
@@ -3934,6 +4013,7 @@ function renderResults() {
     <div class="summary-card"><div class="summary-card-value">${totalOff}</div><div class="summary-card-label">OFF</div></div>
     <div class="summary-card"><div class="summary-card-value">${totalCuti}</div><div class="summary-card-label">CUTI</div></div>
     <div class="summary-card"><div class="summary-card-value" data-vcount style="color: ${state.violations.length ? 'var(--danger)' : 'var(--success)'}">${state.violations.length}</div><div class="summary-card-label">Violations</div></div>
+    <div class="summary-card"><div class="summary-card-value" style="color:#065F46;font-size:18px;">${fmtRupiah(Math.round(Object.values(state.insentifPerCso||{}).reduce((s,x)=>s+x,0)/Math.max(state.csoList.length,1)))}</div><div class="summary-card-label">💰 Avg Insentif/CSO</div></div>
   `;
 
   // ── Feasibility warning banner ──────────────────────────────────────────
@@ -4155,6 +4235,7 @@ function renderScheduleTable() {
   html += '<th style="background:#1B5E3F;color:white;min-width:52px;">Kerja</th>';
   html += '<th style="background:#4B5563;color:white;min-width:44px;">OFF</th>';
   html += '<th style="background:#92400E;color:white;min-width:44px;">CUTI</th>';
+  html += '<th style="background:#065F46;color:#A7F3D0;min-width:72px;font-size:10px;">💰 Insentif</th>';
   html += '</tr></thead><tbody>';
 
   // Per-day counts for footer row
@@ -4198,6 +4279,14 @@ function renderScheduleTable() {
   html += `<td style="font-weight:700;color:#1B5E3F;text-align:center;background:#F0FDF4;">${cWork}</td>`;
   html += `<td style="font-weight:700;color:${offColor};text-align:center;background:#F9FAFB;" title="Target: ${targetOff}">${cOff}<span style="font-size:9px;color:var(--muted)">/${targetOff}</span></td>`;
   html += `<td style="font-weight:700;color:${cutiColor};text-align:center;background:#FEF9C3;" title="Target: ${targetCuti}">${cCuti}<span style="font-size:9px;color:var(--muted)">/${targetCuti}</span></td>`;
+  // Kolom insentif per CSO
+  const totalInsentif = state.insentifPerCso ? (state.insentifPerCso[c.id] || 0) : 0;
+  const allInsentifs = state.insentifPerCso ? Object.values(state.insentifPerCso) : [0];
+  const avgInsentif2 = allInsentifs.reduce((s,x)=>s+x,0) / Math.max(allInsentifs.length,1);
+  const iColor = totalInsentif < avgInsentif2 * 0.75 ? 'var(--danger)' : totalInsentif > avgInsentif2 * 1.25 ? '#92400E' : '#065F46';
+  const isFlat = (state.flat||[]).some(f=>f.cso===c.name);
+  const iLabel = isFlat ? '<span style="font-size:9px;color:var(--muted)">FLAT</span>' : `<span style="font-size:11px;">${fmtRupiah(totalInsentif)}</span>`;
+  html += `<td style="font-weight:700;color:${iColor};text-align:center;background:#ECFDF5;" title="Rata-rata: ${fmtRupiah(Math.round(avgInsentif2))}">${iLabel}</td>`;
   html += '</tr>';
   });
 
@@ -4211,7 +4300,7 @@ function renderScheduleTable() {
     const color = dayWork[k] < kuotaTarget ? 'var(--danger)' : '#1B5E3F';
     html += `<td style="text-align:center;color:${color};font-weight:700;">${dayWork[k]}</td>`;
   }
-  html += `<td></td><td></td><td></td></tr>`;
+  html += `<td></td><td></td><td></td><td></td></tr>`;
 
   // Row 2: OFF per hari
   html += `<tr style="background:#F9FAFB;font-weight:600;font-size:10px;">`;
@@ -4220,7 +4309,7 @@ function renderScheduleTable() {
     const k = dateKey(state.year, state.month, d);
     html += `<td style="text-align:center;color:#4B5563;">${dayOff[k]}</td>`;
   }
-  html += `<td></td><td></td><td></td></tr>`;
+  html += `<td></td><td></td><td></td><td></td></tr>`;
 
   // Row 3: CUTI per hari
   html += `<tr style="background:#FEF9C3;font-weight:600;font-size:10px;">`;
@@ -4229,7 +4318,7 @@ function renderScheduleTable() {
     const k = dateKey(state.year, state.month, d);
     html += `<td style="text-align:center;color:#92400E;">${dayCuti[k]}</td>`;
   }
-  html += `<td></td><td></td><td></td></tr>`;
+  html += `<td></td><td></td><td></td><td></td></tr>`;
 
   html += '</tbody>';
   document.getElementById('scheduleTable').innerHTML = html;
@@ -5259,8 +5348,8 @@ function exportShiftReportExcel() {
     const header1 = ['No','Nama CSO','Site','Skill'];
     const header2 = ['','','',''];
     dayMeta.forEach(m => { header1.push(m.d); header2.push(DAY_NAMES_SHORT[m.dow]); });
-    header1.push('Total Kerja','OFF','CUTI');
-    header2.push('','','');
+    header1.push('Total Kerja','OFF','CUTI','Insentif (Rp)');
+    header2.push('','','','');
 
     const aoa = [header1, header2];
     const merges = [
@@ -5271,6 +5360,7 @@ function exportShiftReportExcel() {
       { s:{r:0,c:4+days}, e:{r:1,c:4+days} },   // Total Kerja
       { s:{r:0,c:5+days}, e:{r:1,c:5+days} },   // OFF
       { s:{r:0,c:6+days}, e:{r:1,c:6+days} },   // CUTI
+      { s:{r:0,c:7+days}, e:{r:1,c:7+days} },   // Insentif
     ];
 
     state.csoList.forEach((c, idx) => {
@@ -5283,7 +5373,8 @@ function exportShiftReportExcel() {
         else if (v==='CUTI') cuti++;
         else if (v && v!=='RESIGN') work++;
       });
-      row.push(work, off, cuti);
+      const insentifVal = state.insentifPerCso ? (state.insentifPerCso[c.id] || 0) : 0;
+      row.push(work, off, cuti, insentifVal);
       aoa.push(row);
     });
 
@@ -5294,7 +5385,7 @@ function exportShiftReportExcel() {
     const colWidths = [
       { wch:4 }, { wch:22 }, { wch:9 }, { wch:15 },
       ...dayMeta.map(()=>({ wch:9 })),
-      { wch:11 }, { wch:6 }, { wch:6 },
+      { wch:11 }, { wch:6 }, { wch:6 }, { wch:14 },
     ];
     ws['!cols'] = colWidths;
     ws['!rows'] = [{ hpt:22 }, { hpt:18 }];
@@ -5304,7 +5395,7 @@ function exportShiftReportExcel() {
     ws['!sheetView'] = [{ pane: { topLeftCell: 'E3', xSplit:4, ySplit:2, state:'frozen' } }];
 
     // Style header rows
-    for (let c = 0; c < 4 + days + 3; c++) {
+    for (let c = 0; c < 4 + days + 4; c++) {
       const r1 = XLSX.utils.encode_cell({r:0,c});
       const r2 = XLSX.utils.encode_cell({r:1,c});
       if (c >= 4 && c < 4+days) {
@@ -5337,6 +5428,13 @@ function exportShiftReportExcel() {
       if (ws[totAddr]) ws[totAddr].s = xlStyle({ bold:true, bg:XL_COLORS.WHITE });
       if (ws[offAddr]) ws[offAddr].s = xlStyle({ bold:true, bg:XL_COLORS.OFF, fg:'4B5563' });
       if (ws[ctAddr])  ws[ctAddr].s  = xlStyle({ bold:true, bg:XL_COLORS.CUTI, fg:'854D0E' });
+      // Insentif cell
+      const insAddr = XLSX.utils.encode_cell({r, c:7+days});
+      const insVal  = state.insentifPerCso ? (state.insentifPerCso[c.id] || 0) : 0;
+      const allIns  = state.insentifPerCso ? Object.values(state.insentifPerCso) : [0];
+      const avgIns  = allIns.reduce((s,x)=>s+x,0) / Math.max(allIns.length,1);
+      const insBg   = insVal < avgIns * 0.75 ? 'FEE2E2' : insVal > avgIns * 1.25 ? 'FEF3C7' : 'D1FAE5';
+      if (ws[insAddr]) ws[insAddr].s = xlStyle({ bold:true, bg:insBg, fg:'065F46' });
     });
 
     XLSX.utils.book_append_sheet(wb, ws, 'Jadwal');
@@ -5457,7 +5555,111 @@ function exportShiftReportExcel() {
   }
 
   XLSX.writeFile(wb, `Jadwal_CSO_BCA_Syariah_${MONTHS[state.month]}_${state.year}.xlsx`);
-  notify('✅ Excel (formatted) berhasil di-download — 3 sheet: Jadwal, Shift Report, Istirahat');
+  // ── SHEET 4: INSENTIF (ringkasan per CSO) ──────────────────────────────
+  {
+    const days = daysInMonth(state.year, state.month);
+    const dayMetaIns = [];
+    for (let d = 1; d <= days; d++) {
+      const k = dateKey(state.year, state.month, d);
+      const date = new Date(state.year, state.month, d);
+      dayMetaIns.push({ k, d, isWeekend: isWeekend(date), isHoliday: state.holidays.has(k), isCb: state.cb.has(k) });
+    }
+
+    const SHIFTS_INS = ['S6','S8','S9','S11','S13'];
+    const header = ['No','Nama CSO','Site','Skill',
+      'S6 (WD)','S8 (WD)','S9 (WD)','S11 (WD)','S13 (WD)',
+      'S6 (WE)','S8 (WE)','S9 (WE)','S11 (WE)','S13 (WE)',
+      'Jml Shift','Total Insentif (Rp)','Rank'];
+    const aoa = [header];
+
+    const allRows = state.csoList.map((cso, idx) => {
+      const isFlat = (state.flat||[]).some(f=>f.cso===cso.name);
+      // Count per shift per day type
+      const cntWD = {S6:0,S8:0,S9:0,S11:0,S13:0};
+      const cntWE = {S6:0,S8:0,S9:0,S11:0,S13:0};
+      let totalShift = 0;
+      dayMetaIns.forEach(m => {
+        const v = (state.schedule[cso.id]||{})[m.k] || '';
+        if (!v || v==='OFF'||v==='CUTI'||v==='RESIGN') return;
+        if (/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(v)) return;
+        const base = v.replace(/[LX]$/,'');
+        const isOffDay = m.isWeekend || m.isHoliday || m.isCb;
+        if (isOffDay) { if(cntWE[base]!==undefined) cntWE[base]++; }
+        else          { if(cntWD[base]!==undefined) cntWD[base]++; }
+        totalShift++;
+      });
+      const totalIns = state.insentifPerCso ? (state.insentifPerCso[cso.id]||0) : 0;
+      return { cso, idx, isFlat, cntWD, cntWE, totalShift, totalIns };
+    });
+
+    // Rank by totalIns desc
+    const sorted = [...allRows].sort((a,b)=>b.totalIns-a.totalIns);
+    const rankMap = {};
+    sorted.forEach((r,i)=>{ rankMap[r.cso.id]=i+1; });
+
+    allRows.forEach(({cso,idx,isFlat,cntWD,cntWE,totalShift,totalIns}) => {
+      aoa.push([
+        idx+1, cso.name, cso.site, cso.skill + (isFlat?' [FLAT]':''),
+        cntWD.S6, cntWD.S8, cntWD.S9, cntWD.S11, cntWD.S13,
+        cntWE.S6, cntWE.S8, cntWE.S9, cntWE.S11, cntWE.S13,
+        totalShift, totalIns, rankMap[cso.id]
+      ]);
+    });
+
+    // Footer row: rata-rata
+    const avgIns = allRows.reduce((s,r)=>s+r.totalIns,0) / Math.max(allRows.length,1);
+    aoa.push(['','Rata-rata','','','','','','','','','','','','','',Math.round(avgIns),'']);
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [
+      {wch:4},{wch:22},{wch:9},{wch:16},
+      {wch:8},{wch:8},{wch:8},{wch:8},{wch:8},
+      {wch:8},{wch:8},{wch:8},{wch:8},{wch:8},
+      {wch:9},{wch:16},{wch:6}
+    ];
+
+    // Style header
+    header.forEach((_,ci) => {
+      const addr = XLSX.utils.encode_cell({r:0,c:ci});
+      if (ws[addr]) ws[addr].s = xlStyle({ bg:XL_COLORS.headerBg, fg:XL_COLORS.headerFg, bold:true, size:10 });
+    });
+
+    // Style data rows
+    allRows.forEach(({cso,totalIns},idx) => {
+      const r = idx+1;
+      const allIns2 = allRows.map(x=>x.totalIns);
+      const avgI2 = allIns2.reduce((s,x)=>s+x,0) / Math.max(allIns2.length,1);
+      const insBg = totalIns < avgI2*0.75 ? 'FEE2E2' : totalIns > avgI2*1.25 ? 'FEF3C7' : 'D1FAE5';
+      // Name cols
+      [0,1,2,3].forEach(ci => {
+        const addr = XLSX.utils.encode_cell({r,c:ci});
+        if (ws[addr]) ws[addr].s = xlStyle({ align: ci===1?'left':'center', bold: ci===1 });
+      });
+      // Shift count cols (WD + WE) — putih
+      for (let ci=4; ci<=13; ci++) {
+        const addr = XLSX.utils.encode_cell({r,c:ci});
+        if (ws[addr]) ws[addr].s = xlStyle({ bg:XL_COLORS.WHITE });
+      }
+      // Total shift
+      const tsAddr = XLSX.utils.encode_cell({r,c:14});
+      if (ws[tsAddr]) ws[tsAddr].s = xlStyle({ bold:true, bg:XL_COLORS.WHITE });
+      // Total insentif — warna sesuai posisi vs rata-rata
+      const tiAddr = XLSX.utils.encode_cell({r,c:15});
+      if (ws[tiAddr]) ws[tiAddr].s = xlStyle({ bold:true, bg:insBg, fg:'065F46' });
+      // Rank
+      const rkAddr = XLSX.utils.encode_cell({r,c:16});
+      if (ws[rkAddr]) ws[rkAddr].s = xlStyle({ bold:true, bg:XL_COLORS.WHITE, fg:'1F2937' });
+    });
+
+    // Style footer avg row
+    const fr = allRows.length+1;
+    const avgAddr = XLSX.utils.encode_cell({r:fr,c:15});
+    if (ws[avgAddr]) ws[avgAddr].s = xlStyle({ bold:true, bg:'FEF3C7', fg:'065F46' });
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Insentif');
+  }
+
+  notify('✅ Excel berhasil di-download — 4 sheet: Jadwal, Shift Report, Istirahat, Insentif');
 }
 
 function exportShiftReportCSV() {
