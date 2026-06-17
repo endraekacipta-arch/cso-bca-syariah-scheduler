@@ -443,6 +443,20 @@ textarea {
   border-radius: 4px;
 }
 
+.cso-item-pendidikan {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.cso-item-pendidikan select {
+  padding: 4px 6px;
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-primary);
+  cursor: pointer;
+}
 .cso-item-remove {
   background: none;
   border: none;
@@ -457,6 +471,166 @@ textarea {
   opacity: 0.7;
 }
 
+.cb-config-panel {
+  margin-top: 12px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.cb-config-panel h4 {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1E40AF;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+.cb-config-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: white;
+  border: 1px solid #BFDBFE;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.cb-config-row .cb-date-label {
+  font-weight: 700;
+  color: #1E40AF;
+  min-width: 80px;
+}
+.cb-config-row label { color: var(--text-secondary); font-size: 11px; }
+.cb-config-row input[type="number"] {
+  width: 100px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.cb-config-row input[type="checkbox"] {
+  width: 16px; height: 16px; cursor: pointer;
+}
+.cb-config-row .potong-label {
+  display: flex; align-items: center; gap: 5px;
+  background: #FEF3C7; border-radius: 4px;
+  padding: 3px 8px; font-size: 11px; color: #92400E; font-weight: 600;
+}
+/* Accordion analysis panel */
+.acc-panel {
+  background: #fff8f0;
+  border: 2px solid var(--warn);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.acc-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.acc-panel-header h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--warn);
+  margin: 0;
+}
+.acc-panel-summary {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+.acc-expand-all {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.acc-expand-all:hover { background: var(--bg-light); }
+.acc-section {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 6px;
+  overflow: hidden;
+}
+.acc-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: var(--surface);
+  user-select: none;
+  gap: 8px;
+  transition: background .12s;
+}
+.acc-section-header:hover { background: var(--bg-light); }
+.acc-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.acc-section-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--border);
+  color: var(--text-secondary);
+}
+.acc-section-badge.warn { background: #FEF3C7; color: #92400E; }
+.acc-section-badge.danger { background: #FEE2E2; color: #991B1B; }
+.acc-section-badge.success { background: #D1FAE5; color: #065F46; }
+.acc-section-badge.blue { background: #DBEAFE; color: #1E40AF; }
+.acc-chevron {
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: transform .2s;
+  flex-shrink: 0;
+}
+.acc-section.open .acc-chevron { transform: rotate(90deg); }
+.acc-section-body {
+  display: none;
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-light);
+  font-size: 12px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.acc-section.open .acc-section-body { display: block; }
+.acc-row {
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.acc-row:last-child { border-bottom: none; }
+.acc-info-box {
+  padding: 10px 12px;
+  background: var(--ice-3);
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--navy-2);
+  border-left: 3px solid var(--navy);
+  margin-top: 10px;
+}
 .empty-state {
   text-align: center;
   color: var(--text-tertiary);
@@ -732,6 +906,9 @@ textarea {
 .v-badge.r7  { background: #F97316; }
 .v-badge.r1a { background: #8B5CF6; }
 .v-badge.r1b { background: #3B82F6; }
+.v-badge.r15 { background: #0D9488; }
+.v-badge.r4  { background: #DB2777; }
+.v-badge.r12 { background: #7C3AED; }
 .v-badge.r2  { background: #10B981; }
 .v-badge.r3  { background: #EC4899; }
 .v-empty { text-align:center; padding:24px; color:var(--text-secondary); font-style:italic; font-size:12px; }
@@ -1018,9 +1195,13 @@ td.cell-editing { padding: 1px !important; background: #FFF7ED !important; }
       <div class="date-chips" id="holidayChips"></div>
     </div>
 
-    <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 16px;">
       <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--text-primary);">Cuti Bersama</label>
       <div class="date-chips" id="cbChips"></div>
+    </div>
+    <div id="cbConfigPanel" class="cb-config-panel" style="display:none;">
+      <h4>⚙ Konfigurasi Lembur & Cuti per Tanggal CB</h4>
+      <div id="cbConfigRows"></div>
     </div>
 
     <div class="button-group">
@@ -1454,14 +1635,67 @@ Citra Dewi
 
     <div id="violationsContainer"></div>
 
-    <div style="display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; align-items:center;">
-      <button class="btn btn-primary btn-small" onclick="exportShiftReportExcel()">📊 Export Excel</button>
-      <span style="font-size:11px;color:var(--muted);">Berisi 4 sheet: Jadwal · Shift Report · Istirahat · Insentif</span>
-      <button class="btn btn-secondary btn-small" id="btnResetEdits" onclick="resetAllEdits()" style="display:none;">
-        ↩ Reset Edit (<span id="editCount">0</span>)
-      </button>
-      <button class="btn btn-secondary btn-small" onclick="prevStep(5)">← Adjust Input</button>
-      <button class="btn btn-primary btn-small" onclick="generateSchedule()">↻ Re-generate</button>
+    <!-- Toolbar Step 6 -->
+    <div style="margin:24px 0;background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:8px;">
+
+      <!-- Row 1: Export group (kiri) -->
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button class="btn btn-primary btn-small" onclick="exportExcelCso()"
+          title="Export Jadwal + Istirahat untuk CSO" style="display:flex;align-items:center;gap:5px;">
+          📅 <span>Export CSO</span>
+        </button>
+        <button class="btn btn-primary btn-small" onclick="exportAnalytics()"
+          title="Export Jadwal + Analytics + THP untuk manajemen"
+          style="background:#1D4ED8;display:flex;align-items:center;gap:5px;">
+          📊 <span>Export Analytics</span>
+        </button>
+      </div>
+
+      <!-- Row 2: Edit tools (kiri) + Nav (kanan jauh) -->
+      <div style="display:flex;align-items:center;gap:6px;">
+
+        <!-- Swap + Undo/Redo -->
+        <button onclick="openSwapModal()"
+          title="Tukar jadwal antara 2 CSO — 1 tanggal atau 2 tanggal sekaligus"
+          style="padding:6px 12px;border:1px solid #C4B5FD;border-radius:6px;
+                 background:#F5F3FF;color:#5B21B6;font-size:12px;font-weight:700;cursor:pointer;
+                 font-family:inherit;display:flex;align-items:center;gap:4px;">
+          🔄 Swap CSO
+        </button>
+        <div style="width:1px;height:20px;background:var(--border);flex-shrink:0;margin:0 2px;"></div>
+        <button id="_btnUndo" onclick="undoEdit()" disabled
+          title="Tidak ada undo"
+          style="padding:6px 12px;border:1px solid var(--border);border-radius:6px;
+                 background:#fff;color:#374151;font-size:12px;font-weight:700;cursor:pointer;
+                 font-family:inherit;opacity:0.4;display:flex;align-items:center;gap:4px;">
+          ↩ Undo
+        </button>
+        <button id="_btnRedo" onclick="redoEdit()" disabled
+          title="Tidak ada redo"
+          style="padding:6px 12px;border:1px solid var(--border);border-radius:6px;
+                 background:#fff;color:#374151;font-size:12px;font-weight:700;cursor:pointer;
+                 font-family:inherit;opacity:0.4;display:flex;align-items:center;gap:4px;">
+          Redo ↪
+        </button>
+        <button id="btnResetEdits" onclick="resetAllEdits()"
+          title="Reset semua edit manual ke jadwal awal generate"
+          style="display:none;padding:6px 12px;border:1px solid #FCA5A5;border-radius:6px;
+                 background:#FEF2F2;color:#DC2626;font-size:12px;font-weight:700;cursor:pointer;
+                 font-family:inherit;white-space:nowrap;">
+          ↩ Reset (<span id="editCount">0</span>)
+        </button>
+
+        <!-- Nav: kanan jauh -->
+        <div style="display:flex;gap:6px;align-items:center;margin-left:auto;">
+          <button class="btn btn-secondary btn-small" onclick="prevStep(5)">← Adjust Input</button>
+          <button class="btn btn-primary btn-small" onclick="generateSchedule()"
+            style="display:flex;align-items:center;gap:5px;">
+            ↻ Re-generate
+          </button>
+        </div>
+
+      </div>
+
     </div>
 
     <!-- Tab switcher -->
@@ -1550,7 +1784,7 @@ const state = {
   totalCuti: 1,
   holidays: new Set(),
   cb: new Set(),
-  csoList: [],
+  cbConfig: {},               // cbConfig[dateKey] = {lemburCb, uangMakan, potongCuti}
   kuota: {},
   schedule: {},
   violations: [],
@@ -1563,9 +1797,107 @@ const state = {
   flat: [],
   requestOff: [],
   requestCuti: [],
+  csoList: [],
 };
 
 const SHIFTS_BCA = ['S6','S8','S9','S11','S13'];
+
+// ── Undo / Redo stack (Fitur 3) ──────────────────────────────
+// Setiap entry: { type:'cell'|'swap', payload:{...} }
+let _undoStack = [];
+let _redoStack = [];
+const UNDO_MAX  = 25;
+
+function _pushUndo(entry) {
+  _undoStack.push(entry);
+  if (_undoStack.length > UNDO_MAX) _undoStack.shift();
+  _redoStack = []; // redo dibatalkan setiap ada aksi baru
+  _updateUndoRedoUI();
+}
+
+function undoEdit() {
+  if (!_undoStack.length) { notify('Tidak ada yang bisa di-undo'); return; }
+  const entry = _undoStack.pop();
+  _redoStack.push(entry);
+  _applyUndoRedo(entry, 'undo');
+  _updateUndoRedoUI();
+}
+
+function redoEdit() {
+  if (!_redoStack.length) { notify('Tidak ada yang bisa di-redo'); return; }
+  const entry = _redoStack.pop();
+  _undoStack.push(entry);
+  _applyUndoRedo(entry, 'redo');
+  _updateUndoRedoUI();
+}
+
+function _applyUndoRedo(entry, dir) {
+  if (entry.type === 'cell') {
+    const { csoId, dk, before, after } = entry;
+    const val = dir === 'undo' ? before : after;
+    if (!state.schedule[csoId]) state.schedule[csoId] = {};
+    state.schedule[csoId][dk] = val;
+    // manualEdits: hapus jika kembali ke original
+    if (!state.manualEdits) state.manualEdits = {};
+    const orig = state.origSchedule && state.origSchedule[csoId] && state.origSchedule[csoId][dk];
+    if (val === orig) delete state.manualEdits[csoId+'||'+dk];
+    else state.manualEdits[csoId+'||'+dk] = true;
+  } else if (entry.type === 'swap') {
+    // swap: undo dan redo keduanya cukup swap ulang (operasi idempoten)
+    const { csoIdA, csoIdB, dk } = entry;
+    if (!state.schedule[csoIdA]) state.schedule[csoIdA] = {};
+    if (!state.schedule[csoIdB]) state.schedule[csoIdB] = {};
+    const tmp = state.schedule[csoIdA][dk];
+    state.schedule[csoIdA][dk] = state.schedule[csoIdB][dk];
+    state.schedule[csoIdB][dk] = tmp;
+    if (!state.manualEdits) state.manualEdits = {};
+    [csoIdA, csoIdB].forEach(id => {
+      const orig = state.origSchedule && state.origSchedule[id] && state.origSchedule[id][dk];
+      if (state.schedule[id][dk] === orig) delete state.manualEdits[id+'||'+dk];
+      else state.manualEdits[id+'||'+dk] = true;
+    });
+  } else if (entry.type === 'swapOff') {
+    // swapOff: 2 swap di 2 tanggal — undo restore before, redo re-swap
+    const { csoIdA, csoIdB, kA, kB, before } = entry;
+    if (!state.schedule[csoIdA]) state.schedule[csoIdA] = {};
+    if (!state.schedule[csoIdB]) state.schedule[csoIdB] = {};
+    if (dir === 'undo') {
+      state.schedule[csoIdA][kA] = before.AatA;
+      state.schedule[csoIdB][kA] = before.BatA;
+      state.schedule[csoIdA][kB] = before.AatB;
+      state.schedule[csoIdB][kB] = before.BatB;
+    } else {
+      // redo: re-apply symmetric swap
+      state.schedule[csoIdA][kA] = before.BatA;
+      state.schedule[csoIdB][kA] = before.AatA;
+      state.schedule[csoIdA][kB] = before.BatB;
+      state.schedule[csoIdB][kB] = before.AatB;
+    }
+    if (!state.manualEdits) state.manualEdits = {};
+    [[csoIdA,kA],[csoIdB,kA],[csoIdA,kB],[csoIdB,kB]].forEach(([id,k]) => {
+      const orig = state.origSchedule && state.origSchedule[id] && state.origSchedule[id][k];
+      if (state.schedule[id][k] === orig) delete state.manualEdits[id+'||'+k];
+      else state.manualEdits[id+'||'+k] = true;
+    });
+  }
+  revalidateAfterEdit();
+  renderScheduleTable();
+}
+
+function _updateUndoRedoUI() {
+  const bu = document.getElementById('_btnUndo');
+  const br = document.getElementById('_btnRedo');
+  if (bu) {
+    bu.disabled = _undoStack.length === 0;
+    bu.title = _undoStack.length ? `Undo (${_undoStack.length})` : 'Tidak ada undo';
+    bu.style.opacity = _undoStack.length ? '1' : '0.4';
+  }
+  if (br) {
+    br.disabled = _redoStack.length === 0;
+    br.title = _redoStack.length ? `Redo (${_redoStack.length})` : 'Tidak ada redo';
+    br.style.opacity = _redoStack.length ? '1' : '0.4';
+  }
+}
 // Rule 1A helpers — accounts for gaps in SHIFTS_BCA (no S7, S10, S12)
 // After S13(13): min tomorrow = 10 → lowest available = S11(11)
 // After S11(11): min tomorrow =  8 → lowest available = S8(8)
@@ -1601,6 +1933,24 @@ function parseKey(k) { const [y,m,d] = k.split('-').map(Number); return new Date
 function isWeekend(date) { const d = date.getDay(); return d === 0 || d === 6; }
 function shiftLevel(s) { const m = s && s.match(/^S(\d+)/); return m ? parseInt(m[1]) : null; }
 
+// Hitung streak shift SAMA berturut sebelum tanggal k (strip L/X suffix)
+// CUTI dan OFF memutus streak. Return { base, count }.
+function sameShiftStreak(id, k, schedule, allDates) {
+  const idx = allDates.indexOf(k);
+  if (idx <= 0) return { base: null, count: 0 };
+  let count = 0, base = null;
+  for (let i = idx - 1; i >= 0; i--) {
+    const v = schedule[id][allDates[i]];
+    if (!v || v === 'OFF' || v === 'CUTI' || v === 'RESIGN') break; // pemutus streak
+    if (/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(v)) break;
+    const b = v.replace(/[LX]$/, '');
+    if (base === null) base = b;
+    if (b !== base) break;
+    count++;
+  }
+  return { base, count };
+}
+
 // Hitung insentif satu hari (weekday/weekend aware)
 function calcInsentif(val, meta) {
   if (!val || val === 'OFF' || val === 'CUTI' || val === 'RESIGN') return 0;
@@ -1608,10 +1958,15 @@ function calcInsentif(val, meta) {
   const base = val.replace(/[LX]$/, '');
   const isOffDay = meta.isWeekend || meta.isHoliday || meta.isCb;
   if (isOffDay) {
-    return { S6:120000, S8:100000, S9:100000, S11:110000, S13:110000 }[base] || 0;
+    return { S6:127000, S8:100000, S9:100000, S11:125000, S13:125000 }[base] || 0;
   } else {
-    return { S6:100000, S11:80000, S13:80000 }[base] || 0;
+    return { S6:73000, S11:68000, S13:68000 }[base] || 0;
   }
+}
+
+// Gaji pokok berdasarkan pendidikan
+function gajiPokok(pendidikan) {
+  return { 'SMA/SMK':4800000, 'D3':4900000, 'S1':5100000, 'S2':5300000 }[pendidikan] || 4800000;
 }
 
 // Format rupiah ringkas
@@ -1706,11 +2061,52 @@ function renderDateChips() {
     cChip.className = 'date-chip' + (we ? ' weekend' : '') + (state.cb.has(k) ? ' active' : '');
     cChip.textContent = d + ' ' + DAYS[date.getDay()];
     cChip.onclick = () => {
-      state.cb.has(k) ? state.cb.delete(k) : state.cb.add(k);
+      if (state.cb.has(k)) {
+        state.cb.delete(k);
+        delete state.cbConfig[k];
+      } else {
+        state.cb.add(k);
+        if (!state.cbConfig[k]) state.cbConfig[k] = { lemburCb: 0, uangMakan: 0, potongCuti: false };
+      }
       cChip.classList.toggle('active');
+      renderCbConfigPanel();
     };
     cWrap.appendChild(cChip);
   }
+  renderCbConfigPanel();
+}
+
+function renderCbConfigPanel() {
+  const panel = document.getElementById('cbConfigPanel');
+  const rows  = document.getElementById('cbConfigRows');
+  if (!panel || !rows) return;
+  const cbDates = Array.from(state.cb).sort();
+  if (!cbDates.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  rows.innerHTML = '';
+  cbDates.forEach(k => {
+    const date = new Date(k);
+    const dayName = DAYS[date.getDay()];
+    const d = parseInt(k.slice(8));
+    const cfg = state.cbConfig[k] || (state.cbConfig[k] = { lemburCb:0, uangMakan:0, potongCuti:false });
+    const row = document.createElement('div');
+    row.className = 'cb-config-row';
+    row.innerHTML = `
+      <span class="cb-date-label">📅 ${d} ${dayName}</span>
+      <label>Uang Lembur CB</label>
+      <input type="number" min="0" value="${cfg.lemburCb||0}" placeholder="0"
+        onchange="state.cbConfig['${k}'].lemburCb = parseInt(this.value)||0">
+      <label>Uang Makan</label>
+      <input type="number" min="0" value="${cfg.uangMakan||0}" placeholder="0 (opsional)"
+        onchange="state.cbConfig['${k}'].uangMakan = parseInt(this.value)||0">
+      <label class="potong-label">
+        <input type="checkbox" ${cfg.potongCuti?'checked':''}
+          onchange="state.cbConfig['${k}'].potongCuti = this.checked">
+        Potong Cuti Tahunan
+      </label>
+    `;
+    rows.appendChild(row);
+  });
 }
 
 // ============================================================
@@ -1731,6 +2127,7 @@ function parseBulkInput() {
       id: 'cso_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
       name,
       sisaCuti,
+      pendidikan: parts[4] || 'SMA/SMK',
     });
     added++;
   });
@@ -1752,6 +2149,7 @@ function loadDummyData() {
     id: 'cso_dum_' + i,
     name: n,
     sisaCuti: 8 + (i % 5),
+    pendidikan: ['SMA/SMK','D3','S1','S2'][i % 4],
   }));
   renderCsoList();
   notify('30 CSO dummy dimuat');
@@ -1778,6 +2176,15 @@ function renderCsoList() {
       <div class="cso-item-sisa">
         <label style="font-size: 11px; color: var(--text-secondary);">Sisa:</label>
         <input type="number" value="${c.sisaCuti}" onchange="state.csoList[${i}].sisaCuti = parseInt(this.value) || 0">
+      </div>
+      <div class="cso-item-pendidikan">
+        <label style="font-size: 11px; color: var(--text-secondary);">Pend:</label>
+        <select onchange="state.csoList[${i}].pendidikan = this.value">
+          <option value="SMA/SMK" ${(c.pendidikan||'SMA/SMK')==='SMA/SMK'?'selected':''}>SMA/SMK</option>
+          <option value="D3"       ${(c.pendidikan||'SMA/SMK')==='D3'?'selected':''}>D3</option>
+          <option value="S1"       ${(c.pendidikan||'SMA/SMK')==='S1'?'selected':''}>S1</option>
+          <option value="S2"       ${(c.pendidikan||'SMA/SMK')==='S2'?'selected':''}>S2</option>
+        </select>
       </div>
       <button class="cso-item-remove" onclick="removeCso(${i})">×</button>
     </div>
@@ -2644,6 +3051,21 @@ function renderKuotaTable() {
   const avgKuotaWe = weDates.length ? Math.round(weDates.reduce((s,k)=>{const q=state.kuota[k]||{};return s+(q.s6||0)+(q.s8||0)+(q.s9||0)+(q.s11||0)+(q.s13||0);},0)/weDates.length) : 0;
   const lowKuotaDays = perDayOff.filter(d => d.off > Math.ceil(totalOffBudget/days) + 2).length;
 
+  // Resign-aware display values (konsisten dgn availableOFFs/targetOFFs)
+  const nResign2 = state.resign ? state.resign.size : 0;
+  const totalCutiProrated = state.csoList.reduce((sum, cc) => {
+    const rd = resignMap2[cc.name];
+    const frac = rd ? (rd - 1) / days : 1;
+    return sum + Math.min(Math.round(state.totalCuti * frac), cc.sisaCuti || 0);
+  }, 0);
+  const slotLabel = nResign2 > 0
+    ? `${totalSlotTersedia2} slot aktif (sudah dikurangi ${nResign2} resign)`
+    : `${nCso} CSO × ${days} hari`;
+  const slotVal = nResign2 > 0 ? totalSlotTersedia2 : nCso * days;
+  const cutiLabel = nResign2 > 0
+    ? `prorata resign`
+    : `${state.totalCuti}/CSO × ${nCso} CSO`;
+
   if (feasible) {
     const surplusCsos = surplus > 0 ? Math.ceil(surplus) : 0;
     const reducePerDay = surplus > 0 ? Math.ceil(surplus / days) : 0;
@@ -2658,11 +3080,11 @@ function renderKuotaTable() {
       <div style="background:#fff;border:1px solid #FDE68A;border-radius:6px;padding:10px 14px;margin-bottom:10px;font-family:monospace;font-size:12px;line-height:2;">
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0 12px;">
           <span style="color:var(--text-secondary);">Total slot tersedia</span>
-          <span>: <b>${nCso * days}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(${nCso} CSO × ${days} hari)</span></span>
+          <span>: <b>${slotVal}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(${slotLabel})</span></span>
           <span style="color:var(--text-secondary);">Total kuota kerja</span>
           <span>: <b style="color:#DC2626;">− ${totalKuotaSum2}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(dari tabel Step 5)</span></span>
           <span style="color:var(--text-secondary);">Total CUTI</span>
-          <span>: <b style="color:#DC2626;">− ${nCso * state.totalCuti}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(${state.totalCuti}/CSO × ${nCso} CSO)</span></span>
+          <span>: <b style="color:#DC2626;">− ${totalCutiProrated}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(${cutiLabel})</span></span>
           <span style="border-top:1px solid #FDE68A;padding-top:4px;color:var(--text-secondary);">Sisa slot OFF</span>
           <span style="border-top:1px solid #FDE68A;padding-top:4px;">: <b>${availableOFFs}</b></span>
           <span style="color:var(--text-secondary);">Target OFF</span>
@@ -2690,11 +3112,11 @@ function renderKuotaTable() {
       <div style="background:#fff;border:1px solid #A7F3D0;border-radius:6px;padding:10px 14px;font-family:monospace;font-size:12px;line-height:2;">
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0 12px;">
           <span style="color:var(--text-secondary);">Total slot tersedia</span>
-          <span>: <b>${nCso * days}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(${nCso} CSO × ${days} hari)</span></span>
+          <span>: <b>${slotVal}</b> &nbsp;<span style="color:var(--text-secondary);font-size:11px;">(${slotLabel})</span></span>
           <span style="color:var(--text-secondary);">Total kuota kerja</span>
           <span>: <b style="color:#DC2626;">− ${totalKuotaSum2}</b></span>
           <span style="color:var(--text-secondary);">Total CUTI</span>
-          <span>: <b style="color:#DC2626;">− ${nCso * state.totalCuti}</b></span>
+          <span>: <b style="color:#DC2626;">− ${totalCutiProrated}</b></span>
           <span style="border-top:1px solid #A7F3D0;padding-top:4px;color:var(--text-secondary);">Sisa slot OFF</span>
           <span style="border-top:1px solid #A7F3D0;padding-top:4px;">: <b>${availableOFFs}</b> = Target <b>${targetOFFs}</b> ✓</span>
         </div>
@@ -3033,6 +3455,9 @@ async function generateSchedule() {
     state.schedule = result.schedule;
     state.violations = result.violations;
     state.manualEdits = {};
+    // Reset undo/redo pada setiap generate baru
+    _undoStack = []; _redoStack = [];
+    _updateUndoRedoUI();
     // Deep copy for reset capability
     state.origSchedule = {};
     Object.keys(result.schedule).forEach(cid => {
@@ -3203,7 +3628,8 @@ function generateInternal() {
 
     const doAssign=(cso,sName)=>{
       let sh=sName;
-      if(meta.isFriday&&(state.muslim||new Set()).has(cso.name)&&sh==='S11')sh='S9';
+      const isMuslimFri = meta.isFriday && (state.muslim||new Set()).has(cso.name);
+      if(isMuslimFri && sh==='S11')sh='S9';
       const fr=cm[cso.id].flatRule;
       if(fr&&meta.day>=fr.from&&meta.day<=fr.to&&sh!=='S8'&&sh!=='S9')sh='S8';
       const ys=yKey&&schedule[cso.id][yKey];
@@ -3211,8 +3637,27 @@ function generateInternal() {
         const yb=ys.replace(/[LX]$/,'');
         if(!rule1aOk(yb,sh)){
           const ml2=minAllowedLevel(yb);
-          const cands=SHIFTS_BCA.filter(s=>shiftLevel(s)>=ml2);
-          sh=fr?cands.find(s=>s==='S8'||s==='S9')||'S8':cands[0]||'S9';
+          // R12: muslim Jumat tidak boleh S11 — exclude dari kandidat fallback
+          const cands=SHIFTS_BCA.filter(s=>shiftLevel(s)>=ml2 && !(isMuslimFri && s==='S11'));
+          // Fallback: jika kandidat R12-aware kosong (triple-clash), izinkan S11 (validator R12 akan flag)
+          const candsAll=SHIFTS_BCA.filter(s=>shiftLevel(s)>=ml2);
+          sh=fr?(cands.find(s=>s==='S8'||s==='S9')||'S8'):(cands[0]||candsAll[0]||'S13');
+        }
+      }
+      // R15: jika streak shift sama sudah >= 3, prefer shift lain yg valid R1A
+      // Prioritas: R7 kuota > R15 — hanya swap jika ada kandidat lain yg valid
+      {
+        const { base: streakBase, count: streakCnt } = sameShiftStreak(cso.id, k, schedule, allDates);
+        if (streakCnt >= 3 && sh === streakBase) {
+          const ys2 = yKey && schedule[cso.id][yKey];
+          const ml3 = ys2 && isW(ys2) ? minAllowedLevel(ys2.replace(/[LX]$/,'')) : 0;
+          const altSh = SHIFTS_BCA.find(s => {
+            if (s === streakBase) return false;
+            if (shiftLevel(s) < ml3) return false;
+            if (fr && s !== 'S8' && s !== 'S9') return false;
+            return true;
+          });
+          if (altSh) sh = altSh; // ada alternatif valid → ganti; kalau tidak ada → biarkan (R7 prioritas)
         }
       }
       schedule[cso.id][k]=sh+suffix;
@@ -3381,17 +3826,31 @@ function generateInternal() {
     SHIFTS_BCA.forEach(s=>{ cnt[s]=state.csoList.filter(cc=>{const v=schedule[cc.id][k];return v&&shiftLevel(v)===shiftLevel(s);}).length; });
     const q=state.kuota[k]||{};
     const fr=cm[id].flatRule;
+    // R15: hitung streak shift sama sebelum k
+    const { base: r15Base, count: r15Cnt } = sameShiftStreak(id, k, schedule, allDates);
+    const r15Block = r15Cnt >= 3 ? r15Base : null; // shift ini diblok jika streak sudah 3
+
+    const csoM=state.csoList.find(c=>c.id===id);
+    const isMuslimFri = m2.isFriday && (state.muslim||new Set()).has(csoM?.name||'');
     let best=null, bg=-999;
     [['s6','S6'],['s8','S8'],['s9','S9'],['s11','S11'],['s13','S13']].forEach(([qk,sn])=>{
       const lvl=shiftLevel(sn);
       if(lvl<ml||lvl>maxL)return;
       if(fr&&sn!=='S8'&&sn!=='S9')return;
+      if(sn===r15Block)return; // R15: skip shift yg sama jika streak >= 3
+      if(isMuslimFri && sn==='S11')return; // R12: muslim Jumat tidak boleh S11
       const g=(q[qk]||0)-cnt[sn]; if(g>bg){bg=g;best=sn;}
     });
+    if(!best) best=SHIFTS_BCA.find(s=>{
+      const l=shiftLevel(s);
+      return l>=ml&&l<=maxL&&(!fr||s==='S8'||s==='S9')&&s!==r15Block&&!(isMuslimFri&&s==='S11');
+    })||null;
+    // R15 fallback: jika tidak ada kandidat lain (R7 prioritas), izinkan shift sama (tapi tetap hormati R12)
+    if(!best) best=SHIFTS_BCA.find(s=>{const l=shiftLevel(s);return l>=ml&&l<=maxL&&(!fr||s==='S8'||s==='S9')&&!(isMuslimFri&&s==='S11');})||null;
+    // Triple-clash fallback (R15+R1A+R12 buntu): izinkan S11 utk muslim Jumat demi mengisi slot.
+    // Validator R12 akan menandainya sebagai violation supaya supervisor bisa adjust manual.
     if(!best) best=SHIFTS_BCA.find(s=>{const l=shiftLevel(s);return l>=ml&&l<=maxL&&(!fr||s==='S8'||s==='S9');})||null;
     if(!best) return null;
-    const cso=state.csoList.find(c=>c.id===id);
-    if(m2.isFriday&&(state.muslim||new Set()).has(cso?.name||'')&&best==='S11')best='S9';
     return best+sfx;
   };
 
@@ -3772,6 +4231,8 @@ function maxStreak(pickedSet) {
   return max;
 }
 
+// DEPRECATED — tidak dipakai lagi. Logika shift selection ada di doAssign (Phase 2)
+// dan bestShift (Phase 3). Disimpan untuk referensi, jangan dipanggil.
 function pickShift(cso, k, schedule, dayMeta, rand) {
   const date = parseKey(k);
   const isFriday = date.getDay() === 5;
@@ -3808,6 +4269,32 @@ function validateSchedule(schedule, dayMeta) {
 
   state.csoList.forEach(cso => {
     const sched = schedule[cso.id];
+
+    // Rule 12: Muslim laki-laki tidak boleh S11 di hari Jumat
+    if ((state.muslim||new Set()).has(cso.name)) {
+      allDates.forEach(k => {
+        const m = dayMeta[k];
+        if (!m.isFriday) return;
+        const v = sched[k];
+        if (v && v.replace(/[LX]$/,'') === 'S11') {
+          violations.push({
+            csoId: cso.id, name: cso.name, type: 'Rule 12',
+            msg: `${cso.name}: S11 di hari Jumat (tgl ${m.day}) — muslim seharusnya tidak S11 (Shalat Jumat)`
+          });
+        }
+      });
+    }
+
+    // Rule 4: CUTI tidak boleh di hari libur (weekend/TM/CB)
+    allDates.forEach(k => {
+      const m = dayMeta[k];
+      if (sched[k] === 'CUTI' && (m.isWeekend || m.isHoliday || m.isCb)) {
+        violations.push({
+          csoId: cso.id, name: cso.name, type: 'Rule 4',
+          msg: `${cso.name}: CUTI di hari libur (tgl ${m.day}) — cuti hanya di hari kerja`
+        });
+      }
+    });
 
     for (let i = 1; i < allDates.length; i++) {
       const today = sched[allDates[i]];
@@ -3989,6 +4476,31 @@ function validateSchedule(schedule, dayMeta) {
     // pelanggaran → tidak ada violation per-shift.
   });
 
+  // ── Rule 15: Max 3 hari shift sama berturut (CUTI/OFF memutus) ──────────────
+  state.csoList.forEach(cso => {
+    let streakBase = null, streakCnt = 0, streakStart = 0;
+    allDates.forEach(k => {
+      const v = schedule[cso.id][k];
+      const m = dayMeta[k];
+      // CUTI, OFF, RESIGN, jadwal khusus = pemutus
+      if (!v || v === 'OFF' || v === 'CUTI' || v === 'RESIGN' || /^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(v)) {
+        streakBase = null; streakCnt = 0; return;
+      }
+      const base = v.replace(/[LX]$/, '');
+      if (base === streakBase) {
+        streakCnt++;
+        if (streakCnt === 4) { // hari ke-4 dengan shift sama = violation
+          violations.push({
+            csoId: cso.id, name: cso.name, type: 'Rule 15',
+            msg: `${cso.name}: ${base} ${streakCnt}x berturut mulai tgl ${streakStart} (max 3x)`
+          });
+        }
+      } else {
+        streakBase = base; streakCnt = 1; streakStart = m.day;
+      }
+    });
+  });
+
   return violations;
 }
 
@@ -3996,6 +4508,7 @@ function validateSchedule(schedule, dayMeta) {
 // RENDER RESULTS
 // ============================================================
 function renderResults() {
+  recomputeInsentifFromSchedule();
   const days = daysInMonth(state.year, state.month);
   let totalWork = 0, totalOff = 0, totalCuti = 0;
   Object.values(state.schedule).forEach(s => {
@@ -4128,11 +4641,11 @@ function renderViolationsPanel() {
     return;
   }
 
-  const types     = ['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 7'];
+  const types     = ['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 4','Rule 7','Rule 12','Rule 15'];
   const counts    = {};
   vs.forEach(v => counts[v.type] = (counts[v.type]||0) + 1);
-  const typeClass = {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 7':'r7'};
-  const typeShort = {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 7':'R7'};
+  const typeClass = {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 4':'r4','Rule 7':'r7','Rule 12':'r12','Rule 15':'r15'};
+  const typeShort = {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 4':'R4','Rule 7':'R7','Rule 12':'R12','Rule 15':'R15'};
 
   // Build panel shell only once (or if violations count changed)
   const existing = vc.querySelector('.violations-panel');
@@ -4170,18 +4683,18 @@ function _renderVTabs(vs, counts, types, typeClass, typeShort) {
   const active = window._vFilter || 'ALL';
   let html = `<span class="v-tab all ${active==='ALL'?'active':''}"
     onclick="window._vFilter='ALL';_renderVList();_renderVTabs(state.violations,
-      Object.fromEntries(['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 7'].map(t=>[t,state.violations.filter(v=>v.type===t).length])),
-      ['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 7'],
-      {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 7':'r7'},
-      {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 7':'R7'});">
+      Object.fromEntries(['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 4','Rule 7','Rule 12','Rule 15'].map(t=>[t,state.violations.filter(v=>v.type===t).length])),
+      ['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 4','Rule 7','Rule 12','Rule 15'],
+      {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 4':'r4','Rule 7':'r7','Rule 12':'r12','Rule 15':'r15'},
+      {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 4':'R4','Rule 7':'R7','Rule 12':'R12','Rule 15':'R15'});">
     Semua (${vs.length})</span>`;
   types.filter(t => counts[t]).forEach(t => {
     html += `<span class="v-tab ${typeClass[t]||''} ${active===t?'active':''}"
       onclick="window._vFilter='${t}';_renderVList();_renderVTabs(state.violations,
-        Object.fromEntries(['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 7'].map(t=>[t,state.violations.filter(v=>v.type===t).length])),
-        ['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 7'],
-        {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 7':'r7'},
-        {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 7':'R7'});">
+        Object.fromEntries(['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 4','Rule 7','Rule 12','Rule 15'].map(t=>[t,state.violations.filter(v=>v.type===t).length])),
+        ['Rule 1A','Rule 1B','Rule 2','Rule 3','Rule 4','Rule 7','Rule 12','Rule 15'],
+        {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 4':'r4','Rule 7':'r7','Rule 12':'r12','Rule 15':'r15'},
+        {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 4':'R4','Rule 7':'R7','Rule 12':'R12','Rule 15':'R15'});">
       ${typeShort[t]||t} (${counts[t]})</span>`;
   });
   tabsEl.innerHTML = html;
@@ -4191,8 +4704,8 @@ function _renderVList() {
   const vs     = state.violations;
   const active = window._vFilter || 'ALL';
   const q      = ((document.getElementById('vSearch')||{}).value || window._vSearch || '').toLowerCase().trim();
-  const typeClass = {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 7':'r7'};
-  const typeShort = {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 7':'R7'};
+  const typeClass = {'Rule 1A':'r1a','Rule 1B':'r1b','Rule 2':'r2','Rule 3':'r3','Rule 4':'r4','Rule 7':'r7','Rule 12':'r12','Rule 15':'r15'};
+  const typeShort = {'Rule 1A':'R1A','Rule 1B':'R1B','Rule 2':'R2','Rule 3':'R3','Rule 4':'R4','Rule 7':'R7','Rule 12':'R12','Rule 15':'R15'};
 
   const filtered = vs.filter(v => {
     const matchType   = active === 'ALL' || v.type === active;
@@ -4236,6 +4749,10 @@ function renderScheduleTable() {
   html += '<th style="background:#4B5563;color:white;min-width:44px;">OFF</th>';
   html += '<th style="background:#92400E;color:white;min-width:44px;">CUTI</th>';
   html += '<th style="background:#065F46;color:#A7F3D0;min-width:72px;font-size:10px;">💰 Insentif</th>';
+  html += '<th style="background:#1E40AF;color:#BFDBFE;min-width:80px;font-size:10px;">💼 Gaji Pokok</th>';
+  html += '<th style="background:#374151;color:#D1D5DB;min-width:60px;font-size:10px;">⏰ Lembur</th>';
+  html += '<th style="background:#374151;color:#D1D5DB;min-width:60px;font-size:10px;">🏥 BPJS</th>';
+  html += '<th style="background:#065F46;color:#6EE7B7;min-width:80px;font-size:10px;font-weight:800;">🏠 THP</th>';
   html += '</tr></thead><tbody>';
 
   // Per-day counts for footer row
@@ -4287,6 +4804,16 @@ function renderScheduleTable() {
   const isFlat = (state.flat||[]).some(f=>f.cso===c.name);
   const iLabel = isFlat ? '<span style="font-size:9px;color:var(--muted)">FLAT</span>' : `<span style="font-size:11px;">${fmtRupiah(totalInsentif)}</span>`;
   html += `<td style="font-weight:700;color:${iColor};text-align:center;background:#ECFDF5;" title="Rata-rata: ${fmtRupiah(Math.round(avgInsentif2))}">${iLabel}</td>`;
+  // Gaji Pokok, Lembur, BPJS, THP
+  const gPokok = gajiPokok(c.pendidikan || 'SMA/SMK');
+  const lembur = state.lemburPerCso ? (state.lemburPerCso[c.id] || 0) : 0;
+  const bpjs   = 0;
+  const thp    = gPokok + totalInsentif + lembur - bpjs;
+  const thpColor = '#065F46';
+  html += `<td style="font-weight:700;color:#1E40AF;text-align:center;background:#EFF6FF;font-size:11px;">${fmtRupiah(gPokok)}</td>`;
+  html += `<td style="text-align:center;background:#F9FAFB;font-size:11px;color:#6B7280;">${lembur===0?'—':fmtRupiah(lembur)}</td>`;
+  html += `<td style="text-align:center;background:#F9FAFB;font-size:11px;color:#6B7280;">${bpjs===0?'—':fmtRupiah(bpjs)}</td>`;
+  html += `<td style="font-weight:800;color:${thpColor};text-align:center;background:#D1FAE5;font-size:11px;" title="Gaji Pokok + Insentif − BPJS + Lembur">${fmtRupiah(thp)}</td>`;
   html += '</tr>';
   });
 
@@ -4300,7 +4827,7 @@ function renderScheduleTable() {
     const color = dayWork[k] < kuotaTarget ? 'var(--danger)' : '#1B5E3F';
     html += `<td style="text-align:center;color:${color};font-weight:700;">${dayWork[k]}</td>`;
   }
-  html += `<td></td><td></td><td></td><td></td></tr>`;
+  html += `<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
 
   // Row 2: OFF per hari
   html += `<tr style="background:#F9FAFB;font-weight:600;font-size:10px;">`;
@@ -4309,7 +4836,7 @@ function renderScheduleTable() {
     const k = dateKey(state.year, state.month, d);
     html += `<td style="text-align:center;color:#4B5563;">${dayOff[k]}</td>`;
   }
-  html += `<td></td><td></td><td></td><td></td></tr>`;
+  html += `<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
 
   // Row 3: CUTI per hari
   html += `<tr style="background:#FEF9C3;font-weight:600;font-size:10px;">`;
@@ -4318,7 +4845,7 @@ function renderScheduleTable() {
     const k = dateKey(state.year, state.month, d);
     html += `<td style="text-align:center;color:#92400E;">${dayCuti[k]}</td>`;
   }
-  html += `<td></td><td></td><td></td><td></td></tr>`;
+  html += `<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`;
 
   html += '</tbody>';
   document.getElementById('scheduleTable').innerHTML = html;
@@ -4378,6 +4905,21 @@ function escape(s) {
 // ============================================================
 // SAVE / LOAD CONFIG (Opsi A: JSON Download & Upload)
 // ============================================================
+// Accordion toggle — panel Load Analisis
+function toggleAcc(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('open');
+}
+function toggleAllAcc(ids, btn) {
+  const anyOpen = ids.some(id => document.getElementById(id)?.classList.contains('open'));
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    anyOpen ? el.classList.remove('open') : el.classList.add('open');
+  });
+  if (btn) btn.textContent = anyOpen ? 'Buka Semua ▼' : 'Tutup Semua ▲';
+}
+
 function saveConfig() {
   // Collect latest Step 1 values first
   const m = parseInt(document.getElementById('month').value);
@@ -4409,6 +4951,7 @@ function saveConfig() {
     totalCuti:  tCuti,
     holidays:   Array.from(state.holidays),
     cb:         Array.from(state.cb),
+    cbConfig:   state.cbConfig || {},
     csoList:    state.csoList,
     kuota:      state.kuota,
     resign:     Array.from(state.resign || new Map()),
@@ -4420,7 +4963,9 @@ function saveConfig() {
     schedule:      Object.keys(state.schedule||{}).length ? state.schedule : null,
     istirahat:     Object.keys(state.istirahat||{}).length ? state.istirahat : null,
     violations:    state.violations || [],
-    cutiTerpakai:  cutiTerpakai,   // Task 5: {namaCSO: jumlahCutiTerpakai}
+    cutiTerpakai:  cutiTerpakai,
+    manualEdits:   state.manualEdits  || {},
+    requestOffScheduled: state.requestOffScheduled ? Array.from(state.requestOffScheduled) : [],
   };
 
   const bulan = MONTHS[config.month] || 'Bulan';
@@ -4449,58 +4994,122 @@ function loadConfig(event) {
       const cfg = JSON.parse(e.target.result);
       if (!cfg._version) throw new Error('Bukan file config yang valid');
 
-      // Restore state
-      state.month     = cfg.month     ?? state.month;
-      state.year      = cfg.year      ?? state.year;
-      state.totalOff  = cfg.totalOff  ?? state.totalOff;
-      state.totalCuti = cfg.totalCuti ?? state.totalCuti;
-      state.holidays  = new Set(cfg.holidays  || []);
-      state.cb        = new Set(cfg.cb        || []);
-      state.csoList   = cfg.csoList   || [];
-      state.kuota     = cfg.kuota     || {};
-      state.resign    = new Map(cfg.resign    || []);
-      state.muslim    = new Set(cfg.muslim    || []);
-      state.flat      = cfg.flat      || [];
-      state.jadwalKhusus = cfg.jadwalKhusus  || [];
-      state.requestOff   = cfg.requestOff    || [];
-      state.requestCuti  = cfg.requestCuti   || [];
+      // ── Preview modal sebelum apply ─────────────────────────────
+      const bulanCfg   = MONTHS[cfg.month] || '?';
+      const tahunCfg   = cfg.year || '?';
+      const nCso       = (cfg.csoList||[]).length;
+      const hasJadwal  = cfg.schedule && Object.keys(cfg.schedule).length > 0;
+      const nHoliday   = (cfg.holidays||[]).length;
+      const nCb        = (cfg.cb||[]).length;
+      const nResign    = (cfg.resign||[]).length;
+      const nReqOff    = (cfg.requestOff||[]).length;
+      const nReqCuti   = (cfg.requestCuti||[]).length;
+      const savedAt    = cfg._savedAt ? new Date(cfg._savedAt).toLocaleString('id-ID') : '—';
 
-      // Update Step 1 UI
-      document.getElementById('month').value    = state.month;
-      document.getElementById('year').value     = state.year;
-      document.getElementById('totalOff').value = state.totalOff;
-      document.getElementById('totalCuti').value= state.totalCuti;
+      // Deteksi perbedaan dengan state saat ini
+      const curNamaCso = new Set((state.csoList||[]).map(c=>c.name));
+      const cfgNamaCso = new Set((cfg.csoList||[]).map(c=>c.name));
+      const csoNew     = [...cfgNamaCso].filter(n=>!curNamaCso.has(n));
+      const csoMissing = [...curNamaCso].filter(n=>!cfgNamaCso.has(n));
+      const diffHtml   = (csoNew.length||csoMissing.length) ? `
+        <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:6px;padding:10px 12px;margin-top:10px;font-size:11px;">
+          <b style="color:#92400E;">⚠ Perbedaan CSO dari state saat ini:</b><br>
+          ${csoNew.length    ? `<span style="color:#16A34A;">+ ${csoNew.length} CSO baru: ${csoNew.slice(0,3).join(', ')}${csoNew.length>3?` +${csoNew.length-3} lagi`:''}</span><br>` : ''}
+          ${csoMissing.length? `<span style="color:#DC2626;">− ${csoMissing.length} CSO hilang: ${csoMissing.slice(0,3).join(', ')}${csoMissing.length>3?` +${csoMissing.length-3} lagi`:''}</span>` : ''}
+        </div>` : '';
 
-      // Restore schedule & istirahat if present
-      // Re-render Step 4 lists
-      renderResignList();
-      renderFlatList();
-      renderMuslimList();
-      renderJadwalKhususList();
-      renderRequestOffList();
-      renderRequestCutiList();
+      const modal = document.createElement('div');
+      modal.id = '_loadConfigModal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+      modal.innerHTML = `
+        <div style="background:#fff;border-radius:14px;padding:28px 32px;max-width:460px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.25);font-size:13px;">
+          <div style="font-size:18px;font-weight:800;color:#1B5E3F;margin-bottom:4px;">📂 Preview Config</div>
+          <div style="font-size:12px;color:#6B7280;margin-bottom:16px;">Disimpan: ${savedAt}</div>
+          <div style="background:#F5F7FA;border-radius:8px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;font-size:12px;margin-bottom:6px;">
+            <div><span style="color:#6B7280;">Bulan</span><br><b>${bulanCfg} ${tahunCfg}</b></div>
+            <div><span style="color:#6B7280;">Jumlah CSO</span><br><b>${nCso} orang</b></div>
+            <div><span style="color:#6B7280;">OFF / Cuti per CSO</span><br><b>${cfg.totalOff} / ${cfg.totalCuti} hari</b></div>
+            <div><span style="color:#6B7280;">Tanggal Merah / CB</span><br><b>${nHoliday} / ${nCb} hari</b></div>
+            <div><span style="color:#6B7280;">Resign / Req OFF</span><br><b>${nResign} / ${nReqOff} item</b></div>
+            <div><span style="color:#6B7280;">Jadwal Step 6</span><br><b style="color:${hasJadwal?'#16A34A':'#9CA3AF'}">${hasJadwal?'✓ Ada':'— Belum ada'}</b></div>
+          </div>
+          ${diffHtml}
+          <div style="display:flex;gap:10px;margin-top:18px;justify-content:flex-end;">
+            <button onclick="document.getElementById('_loadConfigModal').remove();document.getElementById('loadConfigInput').value='';"
+              style="padding:9px 20px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">
+              Batal
+            </button>
+            <button id="_loadConfigConfirm"
+              style="padding:9px 20px;border:none;border-radius:8px;background:#1B5E3F;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+              ✓ Load Config Ini
+            </button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
 
-      // Re-render Step 3 CSO list
-      renderCsoList();
-
-      if (cfg.schedule && Object.keys(cfg.schedule).length) {
-        state.schedule   = cfg.schedule;
-        state.istirahat  = cfg.istirahat || {};
-        state.violations = cfg.violations || [];
-        renderResults();
-        notify(`✅ Config + Jadwal dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO · jadwal tersedia → klik Step 6 untuk lihat`);
-      } else {
-        notify(`✅ Config dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO`);
-      }
-
-      // Reset file input so same file can be re-loaded
-      event.target.value = '';
+      // Confirm handler — apply config
+      document.getElementById('_loadConfigConfirm').onclick = () => {
+        modal.remove();
+        _applyLoadConfig(cfg, event);
+      };
 
     } catch(err) {
       notify('❌ Gagal load config: ' + err.message);
+      event.target.value = '';
     }
   };
   reader.readAsText(file);
+}
+
+function _applyLoadConfig(cfg, event) {
+  // Restore state
+  state.month     = cfg.month     ?? state.month;
+  state.year      = cfg.year      ?? state.year;
+  state.totalOff  = cfg.totalOff  ?? state.totalOff;
+  state.totalCuti = cfg.totalCuti ?? state.totalCuti;
+  state.holidays  = new Set(cfg.holidays  || []);
+  state.cb        = new Set(cfg.cb        || []);
+  state.cbConfig  = cfg.cbConfig  || {};
+  state.csoList   = cfg.csoList   || [];
+  state.kuota     = cfg.kuota     || {};
+  state.resign    = new Map(cfg.resign    || []);
+  state.muslim    = new Set(cfg.muslim    || []);
+  state.flat      = cfg.flat      || [];
+  state.jadwalKhusus = cfg.jadwalKhusus  || [];
+  state.requestOff   = cfg.requestOff    || [];
+  state.requestCuti  = cfg.requestCuti   || [];
+
+  // Update Step 1 UI
+  document.getElementById('month').value    = state.month;
+  document.getElementById('year').value     = state.year;
+  document.getElementById('totalOff').value = state.totalOff;
+  document.getElementById('totalCuti').value= state.totalCuti;
+
+  renderResignList();
+  renderFlatList();
+  renderMuslimList();
+  renderJadwalKhususList();
+  renderRequestOffList();
+  renderRequestCutiList();
+  renderCsoList();
+
+  if (cfg.schedule && Object.keys(cfg.schedule).length) {
+    state.schedule   = cfg.schedule;
+    state.istirahat  = cfg.istirahat || {};
+    state.violations = cfg.violations || [];
+    state.manualEdits = cfg.manualEdits || {};
+    state.requestOffScheduled = new Set(cfg.requestOffScheduled || []);
+    // Reset undo stack on fresh load
+    _undoStack = []; _redoStack = [];
+    _updateUndoRedoUI();
+    recomputeInsentifFromSchedule();
+    renderResults();
+    notify(`✅ Config + Jadwal dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO · jadwal tersedia → klik Step 6 untuk lihat`);
+  } else {
+    notify(`✅ Config dimuat — ${MONTHS[state.month]} ${state.year} · ${state.csoList.length} CSO`);
+  }
+
+  if (event) event.target.value = '';
 }
 
 
@@ -4537,71 +5146,28 @@ function loadAnalisisConfig(event) {
         lastWeekDates.push(dateKey(cfg.year, cfg.month, d));
       }
 
-      let analysisHtml = `<h3 style="color:var(--warn);margin-bottom:12px;">📊 Analisa Bulan Lalu (${MONTHS[cfg.month]} ${cfg.year})</h3>`;
-      analysisHtml += `<div style="margin-bottom:16px;font-size:12px;color:var(--text);">`;
-      analysisHtml += `<b>Total CSO:</b> ${cfg.csoList.length} · <b>Violations:</b> ${(cfg.violations||[]).length}<br>`;
-      analysisHtml += `</div>`;
+      // ── Hitung semua data dulu sebelum build UI ──
 
       const carryOverData = [];
-
-      // Per CSO, hitung streak kerja dari akhir bulan
       cfg.csoList.forEach(cso => {
-        let workStreakEnd = 0;
-        let cutiCount = 0;
-        
-        // Hitung mundur dari hari terakhir
+        let workStreakEnd = 0, cutiCount = 0;
         for (let d = days; d >= 1; d--) {
           const k = dateKey(cfg.year, cfg.month, d);
           const v = cfg.schedule[cso.id] ? cfg.schedule[cso.id][k] : null;
-          
-          if (v === 'OFF') break; // Streak putus di OFF
-          if (v === 'CUTI') {
-            cutiCount++;
-            workStreakEnd++; // CUTI dihitung masuk kerja untuk streak
-          } else if (v && v !== 'OFF') {
-            workStreakEnd++;
-          } else {
-            break;
-          }
+          if (!v || v === 'OFF') break;
+          if (v === 'CUTI') { cutiCount++; workStreakEnd++; }
+          else { workStreakEnd++; }
         }
-
         if (workStreakEnd > 0) {
           carryOver[cso.id] = workStreakEnd;
           carryOverData.push({ name: cso.name, streak: workStreakEnd, cuti: cutiCount });
         }
       });
 
-      // Display carry-over streaks
-      if (carryOverData.length > 0) {
-        analysisHtml += `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;max-height:200px;overflow-y:auto;">`;
-        analysisHtml += `<div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;">CARRY-OVER STREAK (Akhir Bulan)</div>`;
-        carryOverData.forEach(item => {
-          const color = item.streak >= 5 ? 'var(--danger)' : 'var(--warn)';
-          analysisHtml += `<div style="padding:6px;border-bottom:1px solid var(--border);font-size:12px;">`;
-          analysisHtml += `<b style="color:${color};">${item.name}</b>: ${item.streak} hari (${item.cuti} cuti) — `;
-          analysisHtml += item.streak >= 5 ? `<span style="color:var(--danger);font-weight:700;">⚠ Harus OFF tgl 1</span>` : `<span style="color:var(--success);">✓ Boleh kerja tgl 1</span>`;
-          analysisHtml += `</div>`;
-        });
-        analysisHtml += `</div>`;
-      }
-
-      // Display existing violations dari bulan lalu
-      if (cfg.violations && cfg.violations.length > 0) {
-        analysisHtml += `<div style="background:var(--danger-soft);border:1px solid var(--danger);border-radius:8px;padding:12px;margin-bottom:12px;max-height:200px;overflow-y:auto;">`;
-        analysisHtml += `<div style="font-size:11px;font-weight:700;color:var(--danger);margin-bottom:8px;">⚠ VIOLATIONS BULAN LALU</div>`;
-        cfg.violations.slice(0, 10).forEach(v => {
-          analysisHtml += `<div style="padding:6px;border-bottom:1px solid rgba(239,68,68,0.2);font-size:11px;">${v.msg}</div>`;
-        });
-        if (cfg.violations.length > 10) {
-          analysisHtml += `<div style="padding:6px;color:var(--muted);font-size:11px;">...dan ${cfg.violations.length - 10} lagi</div>`;
-        }
-        analysisHtml += `</div>`;
-      }
-
-      // Restore CSO list dari bulan lalu (bisa di-override operator)
+      // Restore CSO list
       state.csoList = cfg.csoList || [];
 
-      // Task 5: kurangi sisaCuti per CSO dengan cuti yang terpakai bulan lalu
+      // Kurangi sisa cuti
       const cutiTerpakai = cfg.cutiTerpakai || {};
       const cutiAdjusted = [];
       if (Object.keys(cutiTerpakai).length) {
@@ -4614,24 +5180,136 @@ function loadAnalisisConfig(event) {
           }
         });
       }
+
+      // CB Potong Cuti
+      const cbConfigLalu = cfg.cbConfig || {};
+      const cbPotongCount = Object.values(cbConfigLalu).filter(c => c.potongCuti).length;
+      if (cbPotongCount > 0) {
+        state.csoList.forEach(c => {
+          const before = (typeof c.sisaCuti === 'number') ? c.sisaCuti : parseInt(c.sisaCuti) || 0;
+          c.sisaCuti = Math.max(0, before - cbPotongCount);
+          const existing = cutiAdjusted.find(a => a.name === c.name);
+          if (existing) { existing.used += cbPotongCount; existing.after = c.sisaCuti; }
+          else cutiAdjusted.push({ name: c.name, before, used: cbPotongCount, after: c.sisaCuti, isCb: true });
+        });
+      }
       renderCsoList();
 
-      // Task 5: tampilkan penyesuaian sisa cuti
-      if (cutiAdjusted.length > 0) {
-        analysisHtml += `<div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px;margin-bottom:12px;max-height:220px;overflow-y:auto;">`;
-        analysisHtml += `<div style="font-size:11px;font-weight:700;color:#78350F;margin-bottom:8px;">🏖 SISA CUTI DISESUAIKAN (dikurangi cuti terpakai bulan lalu)</div>`;
-        cutiAdjusted.forEach(item => {
-          analysisHtml += `<div style="padding:5px 6px;border-bottom:1px solid rgba(253,230,138,0.6);font-size:12px;display:flex;justify-content:space-between;gap:8px;">`;
-          analysisHtml += `<b>${escape(item.name)}</b>`;
-          analysisHtml += `<span style="color:#78350F;">${item.before} − ${item.used} terpakai = <b style="color:${item.after===0?'var(--danger)':'#1B5E3F'};">${item.after}</b></span>`;
-          analysisHtml += `</div>`;
-        });
-        analysisHtml += `</div>`;
+      // ── Build accordion UI ──
+      const violCount = (cfg.violations||[]).length;
+      const streakWarn = carryOverData.filter(x=>x.streak>=5).length;
+
+      // Helper buat 1 accordion section
+      const accId = () => 'acc_' + Math.random().toString(36).slice(2,7);
+      function accSection(id, icon, title, badge, badgeCls, bodyHtml) {
+        return `
+          <div class="acc-section" id="${id}">
+            <div class="acc-section-header" onclick="toggleAcc('${id}')">
+              <span class="acc-section-title">${icon} ${title}
+                ${badge ? `<span class="acc-section-badge ${badgeCls}">${badge}</span>` : ''}
+              </span>
+              <span class="acc-chevron">▶</span>
+            </div>
+            <div class="acc-section-body">${bodyHtml}</div>
+          </div>`;
       }
 
-      analysisHtml += `<div style="padding:12px;background:var(--ice-3);border-radius:8px;font-size:12px;color:var(--navy-2);margin-bottom:12px;border-left:3px solid var(--navy);">`;
-      analysisHtml += `<b>ℹ CSO dari bulan lalu sudah di-load di Step 3.</b> Sisa cuti otomatis dikurangi cuti terpakai bulan lalu. Anda bisa edit (tambah/hapus/ubah) jika ada perubahan resign atau CSO baru.`;
-      analysisHtml += `</div>`;
+      let sectionsHtml = '';
+      const sectionIds = [];
+
+      // ── Section 1: Ringkasan ──
+      const s1id = accId(); sectionIds.push(s1id);
+      let s1body = `
+        <div class="acc-row"><span>📅 Periode lalu</span><b>${MONTHS[cfg.month]} ${cfg.year}</b></div>
+        <div class="acc-row"><span>👥 Total CSO</span><b>${cfg.csoList.length} CSO</b></div>
+        <div class="acc-row"><span>⚠ Violations bulan lalu</span><b style="color:${violCount?'var(--danger)':'var(--success)'}">${violCount}</b></div>
+        <div class="acc-row"><span>🔄 Carry-over streak</span><b>${carryOverData.length} CSO</b></div>
+        <div class="acc-row"><span>🏖 Cuti disesuaikan</span><b>${cutiAdjusted.length} CSO</b></div>
+        ${cbPotongCount>0?`<div class="acc-row"><span>📅 CB potong cuti</span><b style="color:#1E40AF;">−${cbPotongCount} hari/CSO</b></div>`:''}
+        <div class="acc-info-box">ℹ CSO sudah di-load di Step 3. Sisa cuti otomatis dikurangi. Anda bisa edit jika ada perubahan.</div>`;
+      sectionsHtml += accSection(s1id, '📊', 'Ringkasan', null, '', s1body);
+
+      // ── Section 2: Carry-Over Streak Jadwal ──
+      const s2id = accId(); sectionIds.push(s2id);
+      let s2badge = carryOverData.length > 0 ? `${carryOverData.length} CSO` : 'Tidak ada';
+      let s2cls = streakWarn > 0 ? 'danger' : carryOverData.length > 0 ? 'warn' : '';
+      let s2body = carryOverData.length === 0
+        ? '<div style="color:var(--text-secondary);font-style:italic;padding:8px 0;">Tidak ada carry-over streak — semua CSO OFF di akhir bulan lalu.</div>'
+        : carryOverData.map(item => {
+            const warn = item.streak >= 5;
+            return `<div class="acc-row">
+              <b style="color:${warn?'var(--danger)':'var(--warn)'};">${escape(item.name)}</b>
+              <span>${item.streak} hari${item.cuti?` (${item.cuti} cuti)`:''} &nbsp;
+                ${warn
+                  ? `<span style="color:var(--danger);font-weight:700;">⚠ Harus OFF tgl 1</span>`
+                  : `<span style="color:var(--success);">✓ Boleh kerja tgl 1</span>`}
+              </span>
+            </div>`;
+          }).join('');
+      sectionsHtml += accSection(s2id, '🔄', 'Carry-Over Streak Jadwal', s2badge, s2cls, s2body);
+
+      // ── Section 3: Sisa Cuti Disesuaikan ──
+      const s3id = accId(); sectionIds.push(s3id);
+      let s3badge = cutiAdjusted.length > 0 ? `${cutiAdjusted.length} CSO` : 'Tidak ada';
+      let s3body = cutiAdjusted.length === 0
+        ? '<div style="color:var(--text-secondary);font-style:italic;padding:8px 0;">Tidak ada penyesuaian sisa cuti.</div>'
+        : cutiAdjusted.map(item => `
+            <div class="acc-row">
+              <b>${escape(item.name)}</b>
+              <span style="color:#78350F;">${item.before} − ${item.used} terpakai = 
+                <b style="color:${item.after===0?'var(--danger)':'#1B5E3F'};">${item.after}</b>
+              </span>
+            </div>`).join('');
+      sectionsHtml += accSection(s3id, '🏖', 'Sisa Cuti Disesuaikan', s3badge, cutiAdjusted.length?'warn':'', s3body);
+
+      // ── Section 4: CB Potong Cuti ──
+      const s4id = accId(); sectionIds.push(s4id);
+      let s4badge = cbPotongCount > 0 ? `−${cbPotongCount} hari` : 'Tidak ada';
+      let s4body = cbPotongCount === 0
+        ? '<div style="color:var(--text-secondary);font-style:italic;padding:8px 0;">Tidak ada CB yang memotong cuti tahunan bulan lalu.</div>'
+        : `<div style="padding:6px 0;font-size:12px;color:#1E40AF;">
+            <b>${cbPotongCount} hari CB</b> bulan ${MONTHS[cfg.month]} ${cfg.year} memotong cuti tahunan.<br>
+            Semua ${state.csoList.length} CSO dikurangi <b>${cbPotongCount} hari</b> dari sisa cuti masing-masing.
+          </div>
+          ${Object.entries(cbConfigLalu).filter(([,v])=>v.potongCuti).map(([k])=>{
+            const d=parseInt(k.slice(8));
+            const cfg2=cbConfigLalu[k];
+            return `<div class="acc-row"><span>📅 Tgl ${d}</span>
+              <span>Lembur Rp${(cfg2.lemburCb||0).toLocaleString('id-ID')} + Makan Rp${(cfg2.uangMakan||0).toLocaleString('id-ID')}</span></div>`;
+          }).join('')}`;
+      sectionsHtml += accSection(s4id, '📅', 'CB Potong Cuti Tahunan', s4badge, cbPotongCount?'blue':'', s4body);
+
+      // ── Section 5: Violations Bulan Lalu ──
+      const s5id = accId(); sectionIds.push(s5id);
+      let s5badge = violCount > 0 ? `${violCount} violation` : 'Bersih';
+      let s5body = violCount === 0
+        ? '<div style="color:var(--success);font-weight:600;padding:8px 0;">✓ Tidak ada violation bulan lalu.</div>'
+        : (cfg.violations||[]).slice(0,15).map(v=>`<div class="acc-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span style="font-size:10px;font-weight:700;color:var(--danger);">[${v.type||''}]</span><span>${v.msg||''}</span></div>`).join('')
+          + (violCount>15?`<div style="padding:6px;color:var(--text-secondary);font-size:11px;">...dan ${violCount-15} lagi</div>`:'');
+      sectionsHtml += accSection(s5id, '⚠', 'Violations Bulan Lalu', s5badge, violCount?'danger':'success', s5body);
+
+      // ── Section 6: Daftar CSO Carry-Over ──
+      const s6id = accId(); sectionIds.push(s6id);
+      let s6badge = `${state.csoList.length} CSO`;
+      let s6body = state.csoList.map((cso,i)=>`
+        <div class="acc-row">
+          <span><b>${i+1}.</b> ${escape(cso.name)}</span>
+          <span style="color:var(--text-secondary);">${cso.site||''} · ${cso.pendidikan||'SMA/SMK'} · Sisa ${cso.sisaCuti||0} hari</span>
+        </div>`).join('');
+      sectionsHtml += accSection(s6id, '👥', 'Daftar CSO (Carry-Over)', s6badge, '', s6body);
+
+      // ── Build final panel HTML ──
+      const sectionIdsStr = sectionIds.join(',');
+      let analysisHtml = `
+        <div class="acc-panel-header">
+          <h3>📊 Analisa Bulan Lalu (${MONTHS[cfg.month]} ${cfg.year})</h3>
+          <button class="acc-expand-all" data-ids="${sectionIdsStr}" onclick="toggleAllAcc(this.dataset.ids.split(','), this)">Buka Semua ▼</button>
+        </div>
+        <div class="acc-panel-summary">
+          ${cfg.csoList.length} CSO · ${violCount} violation · ${carryOverData.length} carry-over streak${cbPotongCount?` · CB −${cbPotongCount} hari cuti`:''}
+        </div>
+        ${sectionsHtml}
+      `;
 
       analysisPanel.innerHTML = analysisHtml;
       
@@ -4677,6 +5355,16 @@ function notify(msg) {
   setTimeout(() => { el.style.opacity = '0'; }, 2500);
 }
 
+// ── Keyboard shortcuts: Ctrl+Z = Undo, Ctrl+Y / Ctrl+Shift+Z = Redo ──────────
+document.addEventListener('keydown', function(e) {
+  const tag = (e.target.tagName||'').toLowerCase();
+  if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+  if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undoEdit(); }
+  if (e.ctrlKey && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+    e.preventDefault(); redoEdit();
+  }
+});
+
 // Init
 document.querySelectorAll('.step').forEach(s => {
   s.addEventListener('click', () => nextStep(parseInt(s.dataset.step)));
@@ -4689,6 +5377,46 @@ renderRequestOffList();
 renderRequestCutiList();
 
 // ── Manual Edit ──────────────────────────────────────────────────────────────
+// Hitung total lembur CB untuk 1 CSO dari schedule aktual
+// Lembur = hari X (CB) yang CSO masuk × (lemburCb + uangMakan)
+function calcLemburCsoDariSchedule(csoId, dm) {
+  let total = 0;
+  Object.keys(dm).forEach(k => {
+    const m = dm[k];
+    if (!m.isCb) return;
+    const v = (state.schedule[csoId] || {})[k] || '';
+    // Hanya CSO yang masuk hari CB (suffix X) dapat lembur
+    if (!v || v === 'OFF' || v === 'CUTI' || v === 'RESIGN') return;
+    if (/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(v)) return;
+    const cfg = (state.cbConfig || {})[k] || {};
+    total += (cfg.lemburCb || 0) + (cfg.uangMakan || 0);
+  });
+  return total;
+}
+
+// Recompute state.insentifPerCso dari state.schedule aktual
+// Dipanggil setelah generate, load config, atau edit cell
+function recomputeInsentifFromSchedule() {
+  if (!state.schedule || !state.csoList.length) return;
+  const days = daysInMonth(state.year, state.month);
+  const dm = {};
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    const date = new Date(state.year, state.month, d);
+    dm[k] = { isWeekend: isWeekend(date), isHoliday: state.holidays.has(k), isCb: state.cb.has(k) };
+  }
+  state.insentifPerCso = {};
+  state.lemburPerCso   = {};
+  state.csoList.forEach(cso => {
+    let totalIns = 0;
+    Object.keys(dm).forEach(k => {
+      totalIns += calcInsentif((state.schedule[cso.id] || {})[k] || '', dm[k]);
+    });
+    state.insentifPerCso[cso.id] = totalIns;
+    state.lemburPerCso[cso.id]   = calcLemburCsoDariSchedule(cso.id, dm);
+  });
+}
+
 function revalidateAfterEdit() {
   const days = daysInMonth(state.year, state.month);
   const dm = {};
@@ -4699,6 +5427,10 @@ function revalidateAfterEdit() {
       isWeekend:isWeekend(date), isHoliday:state.holidays.has(k), isCb:state.cb.has(k) };
   }
   state.violations = validateSchedule(state.schedule, dm);
+
+  // Recompute insentif dari schedule aktual
+  recomputeInsentifFromSchedule();
+
   const el = document.querySelector('[data-vcount]');
   if (el) { el.textContent = state.violations.length; el.style.color = state.violations.length ? 'var(--danger)' : 'var(--success)'; }
   if (typeof renderViolationsPanel === 'function') renderViolationsPanel();
@@ -4719,19 +5451,23 @@ function closeCellEditor() {
 
 function applyCellEdit(csoId, dk, newVal) {
   if (!state.schedule[csoId]) state.schedule[csoId] = {};
+  const before = state.schedule[csoId][dk] || '';
+  if (before === newVal) return; // tidak ada perubahan, skip
+  // Push ke undo stack sebelum apply
+  _pushUndo({ type:'cell', csoId, dk, before, after: newVal });
   state.schedule[csoId][dk] = newVal;
   if (!state.manualEdits) state.manualEdits = {};
   state.manualEdits[csoId + '||' + dk] = true;
-  renderScheduleTable();
   revalidateAfterEdit();
+  renderScheduleTable();
 }
 
 function resetCell(csoId, dk) {
   if (state.origSchedule && state.origSchedule[csoId] && state.origSchedule[csoId][dk] !== undefined)
     state.schedule[csoId][dk] = state.origSchedule[csoId][dk];
   if (state.manualEdits) delete state.manualEdits[csoId + '||' + dk];
-  renderScheduleTable();
   revalidateAfterEdit();
+  renderScheduleTable();
 }
 
 function resetAllEdits() {
@@ -4745,9 +5481,384 @@ function resetAllEdits() {
       state.schedule[csoId][dk] = state.origSchedule[csoId][dk];
   });
   state.manualEdits = {};
-  renderScheduleTable();
+  // Reset undo/redo juga saat reset all
+  _undoStack = []; _redoStack = [];
+  _updateUndoRedoUI();
   revalidateAfterEdit();
+  renderScheduleTable();
   notify('Semua edit manual direset');
+}
+
+// ── Fitur 4: Swap jadwal satu tanggal antara 2 CSO ──────────
+// ── Helper: build dayMeta for validateSchedule simulation ────
+function _buildDayMeta() {
+  const days = daysInMonth(state.year, state.month);
+  const dm = {};
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    const date = new Date(state.year, state.month, d);
+    dm[k] = { day:d, date, isFriday:date.getDay()===5,
+      isWeekend:isWeekend(date), isHoliday:state.holidays.has(k), isCb:state.cb.has(k) };
+  }
+  return dm;
+}
+
+// ── Helper: simulate swap lalu return {added, removed, neutral} violations ──
+function _simulateSwapViolations(simSchedule) {
+  const dm = _buildDayMeta();
+  const before = validateSchedule(state.schedule, dm);
+  const after  = validateSchedule(simSchedule, dm);
+  const beforeMsgs = new Set(before.map(v=>v.msg));
+  const afterMsgs  = new Set(after.map(v=>v.msg));
+  const added   = after.filter(v=>!beforeMsgs.has(v.msg));
+  const removed = before.filter(v=>!afterMsgs.has(v.msg));
+  return { added, removed, totalBefore:before.length, totalAfter:after.length };
+}
+
+// ── Helper: render violation preview HTML ────────────────────
+function _renderSwapViolationPreview(sim) {
+  const { added, removed, totalBefore, totalAfter } = sim;
+  if (!added.length && !removed.length) {
+    return `<div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11px;color:#166534;">
+      ✅ <b>Aman</b> — Tidak ada violation baru. Total violations tetap ${totalAfter}.
+    </div>`;
+  }
+  let html = '';
+  if (added.length) {
+    html += `<div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11px;">
+      <b style="color:#DC2626;">⚠ ${added.length} violation baru jika swap dilakukan:</b>
+      <ul style="margin:6px 0 0 14px;color:#374151;">
+        ${added.slice(0,4).map(v=>`<li>[${v.type}] ${v.msg}</li>`).join('')}
+        ${added.length>4?`<li style="color:#9CA3AF;">...dan ${added.length-4} lagi</li>`:''}
+      </ul>
+    </div>`;
+  }
+  if (removed.length) {
+    html += `<div style="background:#EFF6FF;border:1px solid #93C5FD;border-radius:6px;padding:8px 12px;margin-top:6px;font-size:11px;color:#1E40AF;">
+      ℹ️ Swap ini justru <b>menghapus ${removed.length} violation</b> yang ada.
+    </div>`;
+  }
+  return html;
+}
+
+// ── Helper: render cell badge ─────────────────────────────────
+function _cellBadge(val) {
+  if (!val || val === '—') return `<span style="color:#9CA3AF;">—</span>`;
+  if (val === 'OFF')  return `<span style="background:#E5E7EB;color:#374151;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;">OFF</span>`;
+  if (val === 'CUTI') return `<span style="background:#FDE68A;color:#92400E;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;">CUTI</span>`;
+  return `<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:10px;font-weight:700;font-size:11px;">${val}</span>`;
+}
+
+function openSwapModal() {
+  if (!Object.keys(state.schedule||{}).length) { notify('Generate jadwal dulu sebelum swap'); return; }
+  const old = document.getElementById('_swapModal');
+  if (old) { old.remove(); return; }
+
+  const days = daysInMonth(state.year, state.month);
+  const DAY_SH = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+  const csoOpts = state.csoList.map((c,i) =>
+    `<option value="${i}">${c.name}</option>`).join('');
+
+  // Semua tanggal
+  const tglAllOpts = Array.from({length:days},(_,i) => {
+    const date = new Date(state.year, state.month, i+1);
+    return `<option value="${i+1}">${i+1} ${DAY_SH[date.getDay()]}</option>`;
+  }).join('');
+
+  const modal = document.createElement('div');
+  modal.id = '_swapModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:14px;padding:24px 28px;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.25);font-size:13px;max-height:90vh;overflow-y:auto;">
+      <div style="font-size:17px;font-weight:800;color:#1B5E3F;margin-bottom:14px;">🔄 Tukar Jadwal CSO</div>
+
+      <!-- Mode tabs -->
+      <div style="display:flex;gap:0;border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;margin-bottom:18px;">
+        <button id="_swapTabSame" onclick="_swapSwitchTab('same')"
+          style="flex:1;padding:9px;font-size:12px;font-weight:700;border:none;background:#1B5E3F;color:#fff;cursor:pointer;">
+          📅 Swap 1 Tanggal
+        </button>
+        <button id="_swapTabOff" onclick="_swapSwitchTab('off')"
+          style="flex:1;padding:9px;font-size:12px;font-weight:700;border:none;background:#F9FAFB;color:#6B7280;cursor:pointer;border-left:1px solid #E5E7EB;">
+          🔁 Tukar Hari OFF
+        </button>
+      </div>
+
+      <!-- MODE 1: Swap 1 tanggal (nilai apapun — shift, OFF, CUTI) -->
+      <div id="_swapPaneSame">
+        <div style="font-size:11px;color:#6B7280;margin-bottom:12px;">
+          Tukar nilai jadwal 2 CSO di <b>tanggal yang sama</b> — shift, OFF, maupun CUTI.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">CSO A</label>
+              <select id="_s1CsoA" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${csoOpts}</select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">CSO B</label>
+              <select id="_s1CsoB" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${csoOpts}</select>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">Tanggal</label>
+            <select id="_s1Tgl" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${tglAllOpts}</select>
+          </div>
+          <!-- Preview -->
+          <div id="_s1Preview" style="background:#F8FAFC;border:1px solid #E5E7EB;border-radius:8px;padding:12px;font-size:12px;min-height:48px;"></div>
+          <!-- Violation preview -->
+          <div id="_s1ViolPreview"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end;">
+          <button onclick="document.getElementById('_swapModal').remove();"
+            style="padding:9px 20px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">Batal</button>
+          <button id="_s1Confirm"
+            style="padding:9px 22px;border:none;border-radius:8px;background:#1B5E3F;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🔄 Tukar</button>
+        </div>
+      </div>
+
+      <!-- MODE 2: Tukar 2 Tanggal — swap nilai di tgl1 DAN tgl2 sekaligus -->
+      <div id="_swapPaneOff" style="display:none;">
+        <div style="font-size:11px;color:#6B7280;margin-bottom:12px;">
+          Tukar nilai jadwal 2 CSO di <b>2 tanggal berbeda sekaligus</b>.<br>
+          Berguna saat CSO A dan B mau tukar hari OFF di tanggal yang berbeda.
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <!-- CSO row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">CSO A</label>
+              <select id="_s2CsoA" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${csoOpts}</select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">CSO B</label>
+              <select id="_s2CsoB" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${csoOpts}</select>
+            </div>
+          </div>
+          <!-- Tanggal row -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">Tanggal 1</label>
+              <select id="_s2TglA" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${tglAllOpts}</select>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:700;color:#6B7280;display:block;margin-bottom:4px;">Tanggal 2</label>
+              <select id="_s2TglB" style="width:100%;padding:8px;border:1px solid #E5E7EB;border-radius:6px;font-size:12px;">${tglAllOpts}</select>
+            </div>
+          </div>
+          <!-- Preview -->
+          <div id="_s2Preview" style="background:#F8FAFC;border:1px solid #E5E7EB;border-radius:8px;padding:12px;font-size:12px;min-height:48px;"></div>
+          <!-- Violation preview -->
+          <div id="_s2ViolPreview"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end;">
+          <button onclick="document.getElementById('_swapModal').remove();"
+            style="padding:9px 20px;border:1px solid #E5E7EB;border-radius:8px;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">Batal</button>
+          <button id="_s2Confirm"
+            style="padding:9px 22px;border:none;border-radius:8px;background:#1D4ED8;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">🔁 Tukar 2 Tanggal</button>
+        </div>
+      </div>
+
+    </div>`;
+  document.body.appendChild(modal);
+
+  // ── Tab switching ─────────────────────────────────────────
+  window._swapSwitchTab = function(mode) {
+    const isSame = mode === 'same';
+    document.getElementById('_swapPaneSame').style.display = isSame ? '' : 'none';
+    document.getElementById('_swapPaneOff').style.display  = isSame ? 'none' : '';
+    document.getElementById('_swapTabSame').style.background = isSame ? '#1B5E3F' : '#F9FAFB';
+    document.getElementById('_swapTabSame').style.color      = isSame ? '#fff' : '#6B7280';
+    document.getElementById('_swapTabOff').style.background  = isSame ? '#F9FAFB' : '#1D4ED8';
+    document.getElementById('_swapTabOff').style.color       = isSame ? '#6B7280' : '#fff';
+  };
+
+  // ── MODE 1: preview + violation ───────────────────────────
+  function updateSame() {
+    const idxA = parseInt(document.getElementById('_s1CsoA').value);
+    const idxB = parseInt(document.getElementById('_s1CsoB').value);
+    const d    = parseInt(document.getElementById('_s1Tgl').value);
+    const csoA = state.csoList[idxA];
+    const csoB = state.csoList[idxB];
+    const prev = document.getElementById('_s1Preview');
+    const vprev= document.getElementById('_s1ViolPreview');
+
+    if (!csoA || !csoB || idxA === idxB) {
+      prev.innerHTML = '<span style="color:#EF4444;font-size:12px;">Pilih 2 CSO berbeda</span>';
+      vprev.innerHTML = ''; return;
+    }
+    const k    = dateKey(state.year, state.month, d);
+    const valA = (state.schedule[csoA.id]||{})[k] || '—';
+    const valB = (state.schedule[csoB.id]||{})[k] || '—';
+
+    prev.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+        <div><div style="font-size:10px;color:#6B7280;margin-bottom:3px;">${csoA.name}</div>
+          ${_cellBadge(valA)} → ${_cellBadge(valB)}</div>
+        <div style="font-size:18px;color:#9CA3AF;">⇄</div>
+        <div style="text-align:right;"><div style="font-size:10px;color:#6B7280;margin-bottom:3px;">${csoB.name}</div>
+          ${_cellBadge(valB)} → ${_cellBadge(valA)}</div>
+      </div>`;
+
+    // Simulate
+    const sim = JSON.parse(JSON.stringify(state.schedule));
+    if (!sim[csoA.id]) sim[csoA.id] = {};
+    if (!sim[csoB.id]) sim[csoB.id] = {};
+    sim[csoA.id][k] = valB === '—' ? '' : valB;
+    sim[csoB.id][k] = valA === '—' ? '' : valA;
+    vprev.innerHTML = _renderSwapViolationPreview(_simulateSwapViolations(sim));
+  }
+
+  ['_s1CsoA','_s1CsoB','_s1Tgl'].forEach(id =>
+    document.getElementById(id).addEventListener('change', updateSame));
+  updateSame();
+
+  document.getElementById('_s1Confirm').onclick = () => {
+    const idxA = parseInt(document.getElementById('_s1CsoA').value);
+    const idxB = parseInt(document.getElementById('_s1CsoB').value);
+    const d    = parseInt(document.getElementById('_s1Tgl').value);
+    const csoA = state.csoList[idxA];
+    const csoB = state.csoList[idxB];
+    if (!csoA || !csoB || idxA === idxB) { notify('Pilih 2 CSO berbeda'); return; }
+    const k = dateKey(state.year, state.month, d);
+    if (!state.schedule[csoA.id]) state.schedule[csoA.id] = {};
+    if (!state.schedule[csoB.id]) state.schedule[csoB.id] = {};
+    _pushUndo({ type:'swap', csoIdA:csoA.id, csoIdB:csoB.id, dk:k });
+    const tmp = state.schedule[csoA.id][k];
+    state.schedule[csoA.id][k] = state.schedule[csoB.id][k];
+    state.schedule[csoB.id][k] = tmp;
+    if (!state.manualEdits) state.manualEdits = {};
+    [csoA.id, csoB.id].forEach(id => {
+      const orig = state.origSchedule && state.origSchedule[id] && state.origSchedule[id][k];
+      if (state.schedule[id][k] === orig) delete state.manualEdits[id+'||'+k];
+      else state.manualEdits[id+'||'+k] = true;
+    });
+    revalidateAfterEdit();
+    renderScheduleTable();
+    modal.remove();
+    notify(`✅ Jadwal tgl ${d} ditukar: ${csoA.name} ↔ ${csoB.name}`);
+  };
+
+  // ── MODE 2: preview + violation — dual-date swap ─────────
+  function updateOff() {
+    const idxA = parseInt(document.getElementById('_s2CsoA').value);
+    const idxB = parseInt(document.getElementById('_s2CsoB').value);
+    const dA   = parseInt(document.getElementById('_s2TglA').value);
+    const dB   = parseInt(document.getElementById('_s2TglB').value);
+    const csoA = state.csoList[idxA];
+    const csoB = state.csoList[idxB];
+    const prev = document.getElementById('_s2Preview');
+    const vprev= document.getElementById('_s2ViolPreview');
+
+    if (!csoA || !csoB || idxA === idxB) {
+      prev.innerHTML = '<span style="color:#EF4444;font-size:12px;">Pilih 2 CSO berbeda</span>';
+      vprev.innerHTML = ''; return;
+    }
+    if (dA === dB) {
+      prev.innerHTML = '<span style="color:#F59E0B;font-size:12px;">⚠ Tanggal sama — gunakan mode Swap 1 Tanggal</span>';
+      vprev.innerHTML = ''; return;
+    }
+
+    const kA = dateKey(state.year, state.month, dA);
+    const kB = dateKey(state.year, state.month, dB);
+
+    // Nilai saat ini di 4 cell
+    const AatA = (state.schedule[csoA.id]||{})[kA] || '—';
+    const BatA = (state.schedule[csoB.id]||{})[kA] || '—';
+    const AatB = (state.schedule[csoA.id]||{})[kB] || '—';
+    const BatB = (state.schedule[csoB.id]||{})[kB] || '—';
+
+    // Setelah swap: di tgl1 A↔B, di tgl2 A↔B
+    prev.innerHTML = `
+      <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">
+        2 swap sekaligus — nilai A dan B ditukar di kedua tanggal:
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;">
+        <div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:6px;padding:8px 10px;">
+          <div style="color:#0369A1;font-weight:700;margin-bottom:6px;">Tanggal ${dA}</div>
+          <div style="margin-bottom:4px;">
+            <span style="color:#6B7280;">${csoA.name}:</span><br>
+            ${_cellBadge(AatA)} → ${_cellBadge(BatA)}
+          </div>
+          <div>
+            <span style="color:#6B7280;">${csoB.name}:</span><br>
+            ${_cellBadge(BatA)} → ${_cellBadge(AatA)}
+          </div>
+        </div>
+        <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:6px;padding:8px 10px;">
+          <div style="color:#C2410C;font-weight:700;margin-bottom:6px;">Tanggal ${dB}</div>
+          <div style="margin-bottom:4px;">
+            <span style="color:#6B7280;">${csoA.name}:</span><br>
+            ${_cellBadge(AatB)} → ${_cellBadge(BatB)}
+          </div>
+          <div>
+            <span style="color:#6B7280;">${csoB.name}:</span><br>
+            ${_cellBadge(BatB)} → ${_cellBadge(AatB)}
+          </div>
+        </div>
+      </div>`;
+
+    // Simulate: swap di tgl1, swap di tgl2
+    const sim = JSON.parse(JSON.stringify(state.schedule));
+    if (!sim[csoA.id]) sim[csoA.id] = {};
+    if (!sim[csoB.id]) sim[csoB.id] = {};
+    sim[csoA.id][kA] = BatA === '—' ? '' : BatA;
+    sim[csoB.id][kA] = AatA === '—' ? '' : AatA;
+    sim[csoA.id][kB] = BatB === '—' ? '' : BatB;
+    sim[csoB.id][kB] = AatB === '—' ? '' : AatB;
+    vprev.innerHTML = _renderSwapViolationPreview(_simulateSwapViolations(sim));
+  }
+
+  ['_s2CsoA','_s2CsoB','_s2TglA','_s2TglB'].forEach(id =>
+    document.getElementById(id).addEventListener('change', updateOff));
+  updateOff();
+
+  document.getElementById('_s2Confirm').onclick = () => {
+    const idxA = parseInt(document.getElementById('_s2CsoA').value);
+    const idxB = parseInt(document.getElementById('_s2CsoB').value);
+    const dA   = parseInt(document.getElementById('_s2TglA').value);
+    const dB   = parseInt(document.getElementById('_s2TglB').value);
+    const csoA = state.csoList[idxA];
+    const csoB = state.csoList[idxB];
+    if (!csoA || !csoB || idxA === idxB) { notify('Pilih 2 CSO berbeda'); return; }
+    if (dA === dB) { notify('Tanggal 1 dan 2 harus berbeda — gunakan mode Swap 1 Tanggal'); return; }
+
+    const kA = dateKey(state.year, state.month, dA);
+    const kB = dateKey(state.year, state.month, dB);
+    if (!state.schedule[csoA.id]) state.schedule[csoA.id] = {};
+    if (!state.schedule[csoB.id]) state.schedule[csoB.id] = {};
+
+    // Simpan before untuk undo
+    const AatA = state.schedule[csoA.id][kA] || '';
+    const BatA = state.schedule[csoB.id][kA] || '';
+    const AatB = state.schedule[csoA.id][kB] || '';
+    const BatB = state.schedule[csoB.id][kB] || '';
+
+    _pushUndo({ type:'swapOff',
+      csoIdA:csoA.id, csoIdB:csoB.id, kA, kB,
+      before:{ AatA, BatA, AatB, BatB }
+    });
+
+    // Apply: swap di tgl1, swap di tgl2
+    state.schedule[csoA.id][kA] = BatA;
+    state.schedule[csoB.id][kA] = AatA;
+    state.schedule[csoA.id][kB] = BatB;
+    state.schedule[csoB.id][kB] = AatB;
+
+    // Mark manual edits
+    if (!state.manualEdits) state.manualEdits = {};
+    [[csoA.id,kA],[csoB.id,kA],[csoA.id,kB],[csoB.id,kB]].forEach(([id,k]) => {
+      const orig = state.origSchedule && state.origSchedule[id] && state.origSchedule[id][k];
+      if (state.schedule[id][k] === orig) delete state.manualEdits[id+'||'+k];
+      else state.manualEdits[id+'||'+k] = true;
+    });
+
+    revalidateAfterEdit();
+    renderScheduleTable();
+    modal.remove();
+    notify(`✅ Swap 2 tanggal: ${csoA.name} ↔ ${csoB.name} di tgl ${dA} & ${dB}`);
+  };
 }
 
 // Open inline dropdown editor inside the clicked cell
@@ -5660,6 +6771,320 @@ function exportShiftReportExcel() {
   }
 
   notify('✅ Excel berhasil di-download — 4 sheet: Jadwal, Shift Report, Istirahat, Insentif');
+}
+
+// ── EXPORT EXCEL (untuk CSO): Jadwal + Istirahat saja ──────────────────────
+function exportExcelCso() {
+  if (!Object.keys(state.schedule).length) { notify('Generate jadwal dulu'); return; }
+  if (typeof XLSX === 'undefined') { notify('❌ Library Excel belum siap'); return; }
+
+  const days = daysInMonth(state.year, state.month);
+  const DAY_NAMES_SHORT = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const dayMeta = [];
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    const date = new Date(state.year, state.month, d);
+    const dow = date.getDay();
+    dayMeta.push({ d, k, dow, isWeekend: dow===0||dow===6, isHoliday: state.holidays.has(k), isCb: state.cb.has(k) });
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: Jadwal (tanpa kolom insentif/gaji)
+  {
+    const header1 = ['No','Nama CSO','Site','Skill'];
+    const header2 = ['','','',''];
+    dayMeta.forEach(m => { header1.push(m.d); header2.push(DAY_NAMES_SHORT[m.dow]); });
+    header1.push('Kerja','OFF','CUTI');
+    header2.push('','','');
+    const aoa = [header1, header2];
+    const merges = [
+      {s:{r:0,c:0},e:{r:1,c:0}},{s:{r:0,c:1},e:{r:1,c:1}},
+      {s:{r:0,c:2},e:{r:1,c:2}},{s:{r:0,c:3},e:{r:1,c:3}},
+      {s:{r:0,c:4+days},e:{r:1,c:4+days}},{s:{r:0,c:5+days},e:{r:1,c:5+days}},
+      {s:{r:0,c:6+days},e:{r:1,c:6+days}},
+    ];
+    state.csoList.forEach((cso, idx) => {
+      const row = [idx+1, cso.name, cso.site||'', cso.skill||''];
+      let work=0,off=0,cuti=0;
+      dayMeta.forEach(m => {
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        row.push(xlShiftLabel(v));
+        if(v==='OFF')off++; else if(v==='CUTI')cuti++; else if(v&&v!=='RESIGN')work++;
+      });
+      row.push(work,off,cuti);
+      aoa.push(row);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!merges'] = merges;
+    ws['!cols'] = [{wch:4},{wch:22},{wch:9},{wch:15},...dayMeta.map(()=>({wch:9})),{wch:6},{wch:6},{wch:6}];
+    ws['!freeze'] = {xSplit:4, ySplit:2, topLeftCell:'E3'};
+    // Style headers
+    for(let col=0;col<4+days+3;col++){
+      const a1=XLSX.utils.encode_cell({r:0,c:col});
+      const a2=XLSX.utils.encode_cell({r:1,c:col});
+      if(ws[a1]) ws[a1].s=xlStyle({bg:XL_COLORS.headerBg,fg:XL_COLORS.headerFg,bold:true,size:10});
+      if(col>=4&&col<4+days&&ws[a2]) ws[a2].s=dayHeaderStyle(dayMeta[col-4]);
+    }
+    state.csoList.forEach((cso,idx) => {
+      const r=idx+2;
+      dayMeta.forEach((m,di) => {
+        const addr=XLSX.utils.encode_cell({r,c:4+di});
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        const isEd=!!(state.manualEdits&&state.manualEdits[cso.id+'||'+m.k]);
+        const isOReq=!!(state.requestOffScheduled&&state.requestOffScheduled.has(cso.id+'||'+m.k));
+        if(ws[addr]) ws[addr].s=shiftCellStyle(v,m,isEd,isOReq);
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, ws, 'Jadwal');
+  }
+
+  // Sheet 2: Istirahat (copy dari existing logic)
+  {
+    const header1 = ['No','Nama CSO','Site'];
+    const header2 = ['','',''];
+    dayMeta.forEach(m=>{ header1.push(m.d); header2.push(DAY_NAMES_SHORT[m.dow]); });
+    const aoa = [header1, header2];
+    state.csoList.forEach((cso,idx) => {
+      const row = [idx+1, cso.name, cso.site||''];
+      dayMeta.forEach(m => {
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        if(!v||v==='OFF'||v==='CUTI'||v==='RESIGN'||/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(v)){row.push('');return;}
+        const ist=(state.istirahat[cso.id]||{})[m.k];
+        row.push(ist||getDefaultIstirahat(v));
+      });
+      aoa.push(row);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols']=[{wch:4},{wch:22},{wch:9},...dayMeta.map(()=>({wch:7}))];
+    ws['!freeze']={xSplit:3,ySplit:2,topLeftCell:'D3'};
+    for(let col=0;col<3+days;col++){
+      const a1=XLSX.utils.encode_cell({r:0,c:col});
+      const a2=XLSX.utils.encode_cell({r:1,c:col});
+      if(ws[a1])ws[a1].s=xlStyle({bg:XL_COLORS.headerBg,fg:XL_COLORS.headerFg,bold:true,size:10});
+      if(col>=3&&ws[a2])ws[a2].s=dayHeaderStyle(dayMeta[col-3]);
+    }
+    XLSX.utils.book_append_sheet(wb, ws, 'Istirahat');
+  }
+
+  const fname = `Jadwal_CSO_${MONTHS[state.month]}_${state.year}.xlsx`;
+  XLSX.writeFile(wb, fname);
+  notify('✅ Export Excel (CSO) — 2 sheet: Jadwal & Istirahat');
+}
+
+// ── EXPORT ANALYTICS (untuk Atasan): Jadwal + Istirahat + Sheet Analytics ──
+function exportAnalytics() {
+  if (!Object.keys(state.schedule).length) { notify('Generate jadwal dulu'); return; }
+  if (typeof XLSX === 'undefined') { notify('❌ Library Excel belum siap'); return; }
+
+  const days = daysInMonth(state.year, state.month);
+  const DAY_NAMES_SHORT = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+  const dayMeta = [];
+  for (let d = 1; d <= days; d++) {
+    const k = dateKey(state.year, state.month, d);
+    const date = new Date(state.year, state.month, d);
+    const dow = date.getDay();
+    dayMeta.push({ d, k, dow, isWeekend: dow===0||dow===6, isHoliday: state.holidays.has(k), isCb: state.cb.has(k) });
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // ── Sheet 1: Jadwal lengkap (sama seperti existing tapi include kolom insentif) ──
+  {
+    const header1 = ['No','Nama CSO','Site','Skill'];
+    const header2 = ['','','',''];
+    dayMeta.forEach(m => { header1.push(m.d); header2.push(DAY_NAMES_SHORT[m.dow]); });
+    header1.push('Kerja','OFF','CUTI','Insentif (Rp)','Gaji Pokok','Pendidikan','Lembur','Pot. BPJS','THP');
+    header2.push('','','','','','','','','');
+    const aoa = [header1, header2];
+    const merges = [
+      {s:{r:0,c:0},e:{r:1,c:0}},{s:{r:0,c:1},e:{r:1,c:1}},
+      {s:{r:0,c:2},e:{r:1,c:2}},{s:{r:0,c:3},e:{r:1,c:3}},
+      {s:{r:0,c:4+days},e:{r:1,c:4+days}},{s:{r:0,c:5+days},e:{r:1,c:5+days}},
+      {s:{r:0,c:6+days},e:{r:1,c:6+days}},{s:{r:0,c:7+days},e:{r:1,c:7+days}},
+      {s:{r:0,c:8+days},e:{r:1,c:8+days}},{s:{r:0,c:9+days},e:{r:1,c:9+days}},
+      {s:{r:0,c:10+days},e:{r:1,c:10+days}},{s:{r:0,c:11+days},e:{r:1,c:11+days}},
+      {s:{r:0,c:12+days},e:{r:1,c:12+days}},
+    ];
+    state.csoList.forEach((cso, idx) => {
+      const row = [idx+1, cso.name, cso.site||'', cso.skill||''];
+      let work=0,off=0,cuti=0;
+      dayMeta.forEach(m => {
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        row.push(xlShiftLabel(v));
+        if(v==='OFF')off++; else if(v==='CUTI')cuti++; else if(v&&v!=='RESIGN')work++;
+      });
+      const ins  = state.insentifPerCso ? (state.insentifPerCso[cso.id]||0) : 0;
+      const gaji = gajiPokok(cso.pendidikan||'SMA/SMK');
+      const lemb = state.lemburPerCso ? (state.lemburPerCso[cso.id]||0) : 0;
+      const bpjs = 0;
+      const thp  = gaji + ins + lemb - bpjs;
+      row.push(work, off, cuti, ins, gaji, cso.pendidikan||'SMA/SMK', lemb, bpjs, thp);
+      aoa.push(row);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!merges'] = merges;
+    ws['!cols'] = [{wch:4},{wch:22},{wch:9},{wch:15},...dayMeta.map(()=>({wch:9})),
+      {wch:6},{wch:6},{wch:6},{wch:14},{wch:12},{wch:10},{wch:10},{wch:11},{wch:14}];
+    ws['!freeze'] = {xSplit:4, ySplit:2, topLeftCell:'E3'};
+    // Style headers
+    for(let col=0;col<4+days+9;col++){
+      const a1=XLSX.utils.encode_cell({r:0,c:col});
+      const a2=XLSX.utils.encode_cell({r:1,c:col});
+      if(ws[a1]) ws[a1].s=xlStyle({bg:XL_COLORS.headerBg,fg:XL_COLORS.headerFg,bold:true,size:10});
+      if(col>=4&&col<4+days&&ws[a2]) ws[a2].s=dayHeaderStyle(dayMeta[col-4]);
+    }
+    // Style data rows
+    state.csoList.forEach((cso,idx) => {
+      const r=idx+2;
+      dayMeta.forEach((m,di) => {
+        const addr=XLSX.utils.encode_cell({r,c:4+di});
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        const isEd=!!(state.manualEdits&&state.manualEdits[cso.id+'||'+m.k]);
+        const isOReq=!!(state.requestOffScheduled&&state.requestOffScheduled.has(cso.id+'||'+m.k));
+        if(ws[addr]) ws[addr].s=shiftCellStyle(v,m,isEd,isOReq);
+      });
+      // Summary cols styling
+      const ins = state.insentifPerCso ? (state.insentifPerCso[cso.id]||0) : 0;
+      const allIns = state.insentifPerCso ? Object.values(state.insentifPerCso) : [0];
+      const avgIns = allIns.reduce((s,x)=>s+x,0)/Math.max(allIns.length,1);
+      const insBg = ins<avgIns*0.75?'FEE2E2':ins>avgIns*1.25?'FEF3C7':'D1FAE5';
+      const stylesRight = [
+        xlStyle({bold:true,bg:XL_COLORS.WHITE}),              // Kerja
+        xlStyle({bold:true,bg:XL_COLORS.OFF,fg:'4B5563'}),    // OFF
+        xlStyle({bold:true,bg:XL_COLORS.CUTI,fg:'854D0E'}),   // CUTI
+        xlStyle({bold:true,bg:insBg,fg:'065F46'}),             // Insentif
+        xlStyle({bold:true,bg:'EFF6FF',fg:'1E40AF'}),          // Gaji Pokok
+        xlStyle({bold:true,bg:'F3F4F6',fg:'374151'}),          // Pendidikan
+        xlStyle({bg:XL_COLORS.WHITE}),                         // Lembur
+        xlStyle({bg:XL_COLORS.WHITE}),                         // BPJS
+        xlStyle({bold:true,bg:'F0FDF4',fg:'065F46'}),          // THP
+      ];
+      stylesRight.forEach((sty,si) => {
+        const addr=XLSX.utils.encode_cell({r,c:4+days+si});
+        if(ws[addr]) ws[addr].s=sty;
+      });
+    });
+    XLSX.utils.book_append_sheet(wb, ws, 'Jadwal');
+  }
+
+  // ── Sheet 2: Istirahat ──
+  {
+    const header1=['No','Nama CSO','Site'];
+    const header2=['','',''];
+    dayMeta.forEach(m=>{header1.push(m.d);header2.push(DAY_NAMES_SHORT[m.dow]);});
+    const aoa=[header1,header2];
+    state.csoList.forEach((cso,idx)=>{
+      const row=[idx+1,cso.name,cso.site||''];
+      dayMeta.forEach(m=>{
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        if(!v||v==='OFF'||v==='CUTI'||v==='RESIGN'||/^(BB|TK|CCT|CSPV|CM|SAKIT)/.test(v)){row.push('');return;}
+        const ist=(state.istirahat[cso.id]||{})[m.k];
+        row.push(ist||getDefaultIstirahat(v));
+      });
+      aoa.push(row);
+    });
+    const ws=XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols']=[{wch:4},{wch:22},{wch:9},...dayMeta.map(()=>({wch:7}))];
+    ws['!freeze']={xSplit:3,ySplit:2,topLeftCell:'D3'};
+    for(let col=0;col<3+days;col++){
+      const a1=XLSX.utils.encode_cell({r:0,c:col});
+      const a2=XLSX.utils.encode_cell({r:1,c:col});
+      if(ws[a1])ws[a1].s=xlStyle({bg:XL_COLORS.headerBg,fg:XL_COLORS.headerFg,bold:true,size:10});
+      if(col>=3&&ws[a2])ws[a2].s=dayHeaderStyle(dayMeta[col-3]);
+    }
+    XLSX.utils.book_append_sheet(wb, ws, 'Istirahat');
+  }
+
+  // ── Sheet 3: Analytics (summary per CSO) ──
+  {
+    const hdrs = ['No','Nama CSO','Site','Skill',
+      'Total Kerja','Total OFF','Total CUTI',
+      'Insentif (Rp)','Gaji Pokok (Rp)','Pendidikan','Lembur (Rp)','Pot. BPJS (Rp)','THP (Rp)'];
+    const aoa = [hdrs];
+
+    state.csoList.forEach((cso, idx) => {
+      let work=0, off=0, cuti=0;
+      dayMeta.forEach(m => {
+        const v=(state.schedule[cso.id]||{})[m.k]||'';
+        if(v==='OFF')off++;
+        else if(v==='CUTI')cuti++;
+        else if(v&&v!=='RESIGN')work++;
+      });
+      const ins  = state.insentifPerCso ? (state.insentifPerCso[cso.id]||0) : 0;
+      const gaji = gajiPokok(cso.pendidikan||'SMA/SMK');
+      const lemb = state.lemburPerCso ? (state.lemburPerCso[cso.id]||0) : 0;
+      const bpjs = 0;
+      const thp  = gaji + ins + lemb - bpjs;
+      aoa.push([idx+1, cso.name, cso.site||'', cso.skill||'',
+        work, off, cuti, ins, gaji, cso.pendidikan||'SMA/SMK', lemb, bpjs, thp]);
+    });
+
+    // Footer totals
+    const totIns  = state.csoList.reduce((s,cso)=>s+(state.insentifPerCso?state.insentifPerCso[cso.id]||0:0),0);
+    const totGaji = state.csoList.reduce((s,cso)=>s+gajiPokok(cso.pendidikan||'SMA/SMK'),0);
+    const totLemb = state.csoList.reduce((s,cso)=>s+(state.lemburPerCso?state.lemburPerCso[cso.id]||0:0),0);
+    const totThp  = totGaji + totIns + totLemb;
+    aoa.push(['','TOTAL','','', '','','', totIns, totGaji, '', totLemb, 0, totThp]);
+
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    ws['!cols'] = [{wch:4},{wch:22},{wch:9},{wch:16},
+      {wch:8},{wch:8},{wch:8},
+      {wch:14},{wch:14},{wch:10},{wch:12},{wch:13},{wch:14}];
+    ws['!freeze'] = {xSplit:2, ySplit:1, topLeftCell:'C2'};
+
+    // Header style
+    hdrs.forEach((_,ci)=>{
+      const addr=XLSX.utils.encode_cell({r:0,c:ci});
+      if(ws[addr])ws[addr].s=xlStyle({bg:XL_COLORS.headerBg,fg:XL_COLORS.headerFg,bold:true,size:10});
+    });
+
+    // Data rows style
+    const allIns2=state.csoList.map(cso=>state.insentifPerCso?state.insentifPerCso[cso.id]||0:0);
+    const avgIns2=allIns2.reduce((s,x)=>s+x,0)/Math.max(allIns2.length,1);
+
+    state.csoList.forEach((cso,idx)=>{
+      const r=idx+1;
+      const ins=state.insentifPerCso?state.insentifPerCso[cso.id]||0:0;
+      const insBg=ins<avgIns2*0.75?'FEE2E2':ins>avgIns2*1.25?'FEF3C7':'D1FAE5';
+      // Info cols (No–Pendidikan)
+      [0,1,2,3].forEach(ci=>{
+        const addr=XLSX.utils.encode_cell({r,c:ci});
+        if(ws[addr])ws[addr].s=xlStyle({align:ci===1?'left':'center',bold:ci<=1});
+      });
+      // Count cols
+      [4,5,6].forEach(ci=>{
+        const addr=XLSX.utils.encode_cell({r,c:ci});
+        if(ws[addr])ws[addr].s=xlStyle({bg:XL_COLORS.WHITE,bold:true});
+      });
+      // Money + Pendidikan cols
+      const moneySty=[
+        xlStyle({bold:true,bg:insBg,fg:'065F46'}),           // Insentif
+        xlStyle({bold:true,bg:'EFF6FF',fg:'1E40AF'}),         // Gaji Pokok
+        xlStyle({bold:true,bg:'F3F4F6',fg:'374151'}),         // Pendidikan
+        xlStyle({bg:XL_COLORS.WHITE}),                        // Lembur
+        xlStyle({bg:XL_COLORS.WHITE}),                        // BPJS
+        xlStyle({bold:true,bg:'F0FDF4',fg:'065F46'}),         // THP
+      ];
+      moneySty.forEach((sty,si)=>{
+        const addr=XLSX.utils.encode_cell({r,c:8+si});
+        if(ws[addr])ws[addr].s=sty;
+      });
+    });
+
+    // Footer total row
+    const fr=state.csoList.length+1;
+    hdrs.forEach((_,ci)=>{
+      const addr=XLSX.utils.encode_cell({r:fr,c:ci});
+      if(ws[addr])ws[addr].s=xlStyle({bg:'1B5E3F',fg:'FFFFFF',bold:true});
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Analytics');
+  }
+
+  const fname = `Analytics_CSO_${MONTHS[state.month]}_${state.year}.xlsx`;
+  XLSX.writeFile(wb, fname);
+  notify('✅ Export Analytics — 3 sheet: Jadwal, Istirahat & Analytics');
 }
 
 function exportShiftReportCSV() {
